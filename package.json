@@ -1,10 +1,10 @@
 {
   "name": "typescriptwebpacksupport",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Helper functions to allow usage of typescript and webpack with thingworx widgets. Also includes typings for Thingworx",
   "main": "widgetRuntimeSupport.js",
   "module": "widgetRuntimeSupport.js",
-  "types": "types.d.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
