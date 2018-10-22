@@ -339,6 +339,11 @@ declare interface TWWidgetProperties {
     category: string[];
 
     /**
+     * Name of the property in the property list that should be displayed as the default one when binding
+     */
+    defaultBindingTargetProperty?: string;
+
+    /**
      * Defaults to false. When set to true, the widget will be responsive and may be used in responsive layouts.
      */
     supportsAutoResize?: boolean;
