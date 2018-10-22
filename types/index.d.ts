@@ -597,6 +597,13 @@ declare abstract class TWComposerWidget extends TWWidget {
     hide(): void;
 
     /**
+     * Validates the bindings done to the widgets and reports errors in the ToDos list
+     * The `severity` can be one of: info, warning, error
+     * The message can contain the string `{target-id}` which will be replaced with the widget display name
+     */
+    validate(): {severity: string, message: string}[];
+
+    /**
      * Returns the internal value of the given property, without any additional conversions.
      * Subclasses are expected to not override this method.
      * @param name      The property's name.
