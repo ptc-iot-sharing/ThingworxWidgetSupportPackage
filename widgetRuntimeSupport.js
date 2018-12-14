@@ -249,14 +249,18 @@ export function ThingworxRuntimeWidget(widget) {
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
     var prototype = widget.prototype;
-    Object.defineProperty(widget, 'prototype', {
+    function subclass() {
+        widget.apply(this, arguments);
+    }
+    Object.defineProperty(subclass, 'prototype', {
         get() {
             return prototype;
         },
         set() {}
     });
 
-    TW.Runtime.Widgets[widget.name] = widget;
+    TW.Runtime.Widgets[name] = subclass;
+    return subclass;
 }
 
 /**
@@ -265,14 +269,18 @@ export function ThingworxRuntimeWidget(widget) {
  */
 export function ThingworxComposerWidget(widget) {
     var prototype = widget.prototype;
-    Object.defineProperty(widget, 'prototype', {
+    function subclass() {
+        widget.apply(this, arguments);
+    }
+    Object.defineProperty(subclass, 'prototype', {
         get() {
             return prototype;
         },
         set() {}
     });
 
-    TW.IDE.Widgets[widget.name] = widget;
+    TW.Runtime.Widgets[name] = subclass;
+    return subclass;
 }
 
 /**
@@ -283,16 +291,19 @@ export function TWNamedComposerWidget(name) {
     return function (widget) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
-        // and prevents using the class-based syntax
-        var prototype = widget.prototype;
-        Object.defineProperty(widget, 'prototype', {
+        // and prevents using the class-based syntaxvar prototype = widget.prototype;
+        function subclass() {
+            widget.apply(this, arguments);
+        }
+        Object.defineProperty(subclass, 'prototype', {
             get() {
                 return prototype;
             },
             set() {}
         });
 
-        TW.IDE.Widgets[name] = widget;
+        TW.Runtime.Widgets[name] = subclass;
+        return subclass;
     }
 }
 
@@ -306,13 +317,17 @@ export function TWNamedRuntimeWidget(name) {
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
         var prototype = widget.prototype;
-        Object.defineProperty(widget, 'prototype', {
+        function subclass() {
+            widget.apply(this, arguments);
+        }
+        Object.defineProperty(subclass, 'prototype', {
             get() {
                 return prototype;
             },
             set() {}
         });
 
-        TW.Runtime.Widgets[name] = widget;
+        TW.Runtime.Widgets[name] = subclass;
+        return subclass;
     }
 }
