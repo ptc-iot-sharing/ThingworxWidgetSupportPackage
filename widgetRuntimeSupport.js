@@ -248,7 +248,13 @@ export function ThingworxRuntimeWidget(widget) {
     // Thingworx attempts to change the prototype of the custom widget constructor
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
-    Object.defineProperty(widget, 'prototype', { writable: false });
+    var prototype = widget.prototype;
+    Object.defineProperty(widget, 'prototype', {
+        get() {
+            return prototype;
+        },
+        set() {}
+    });
 
     TW.Runtime.Widgets[widget.name] = widget;
 }
@@ -258,7 +264,13 @@ export function ThingworxRuntimeWidget(widget) {
  * @param widget        The widget class to export.
  */
 export function ThingworxComposerWidget(widget) {
-    Object.defineProperty(widget, 'prototype', { writable: false });
+    var prototype = widget.prototype;
+    Object.defineProperty(widget, 'prototype', {
+        get() {
+            return prototype;
+        },
+        set() {}
+    });
 
     TW.IDE.Widgets[widget.name] = widget;
 }
@@ -272,7 +284,13 @@ export function TWNamedComposerWidget(name) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        Object.defineProperty(widget, 'prototype', { writable: false });
+        var prototype = widget.prototype;
+        Object.defineProperty(widget, 'prototype', {
+            get() {
+                return prototype;
+            },
+            set() {}
+        });
 
         TW.IDE.Widgets[name] = widget;
     }
@@ -287,7 +305,13 @@ export function TWNamedRuntimeWidget(name) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        Object.defineProperty(widget, 'prototype', { writable: false });
+        var prototype = widget.prototype;
+        Object.defineProperty(widget, 'prototype', {
+            get() {
+                return prototype;
+            },
+            set() {}
+        });
 
         TW.Runtime.Widgets[name] = widget;
     }
