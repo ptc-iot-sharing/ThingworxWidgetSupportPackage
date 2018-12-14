@@ -240,6 +240,9 @@ if (typeof TW.Widget == 'function') {
     })();
 }
 
+if (typeof TW.Widget.factory != 'undefined') TW.Widget.factory = eval(TW.Widget.factory.toString());
+if (typeof TW.Widget.factoryWithProperties != 'undefined') TW.Widget.factoryWithProperties = eval(TW.Widget.factoryWithProperties.toString());
+
 /**
  * Makes the given widget class available to Thingworx.
  * @param widget        The widget class to export.
@@ -248,19 +251,9 @@ export function ThingworxRuntimeWidget(widget) {
     // Thingworx attempts to change the prototype of the custom widget constructor
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
-    var prototype = widget.prototype;
-    function subclass() {
-        widget.apply(this, arguments);
-    }
-    Object.defineProperty(subclass, 'prototype', {
-        get() {
-            return prototype;
-        },
-        set() {}
-    });
+    Object.defineProperty(widget, 'prototype', {writable: false});
 
-    TW.Runtime.Widgets[name] = subclass;
-    return subclass;
+    TW.Runtime.Widgets[widget.name] = widget;
 }
 
 /**
@@ -268,19 +261,9 @@ export function ThingworxRuntimeWidget(widget) {
  * @param widget        The widget class to export.
  */
 export function ThingworxComposerWidget(widget) {
-    var prototype = widget.prototype;
-    function subclass() {
-        widget.apply(this, arguments);
-    }
-    Object.defineProperty(subclass, 'prototype', {
-        get() {
-            return prototype;
-        },
-        set() {}
-    });
+    Object.defineProperty(widget, 'prototype', {writable: false});
 
-    TW.Runtime.Widgets[name] = subclass;
-    return subclass;
+    TW.IDE.Widgets[widget.name] = widget;
 }
 
 /**
@@ -292,18 +275,9 @@ export function TWNamedComposerWidget(name) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntaxvar prototype = widget.prototype;
-        function subclass() {
-            widget.apply(this, arguments);
-        }
-        Object.defineProperty(subclass, 'prototype', {
-            get() {
-                return prototype;
-            },
-            set() {}
-        });
+        Object.defineProperty(widget, 'prototype', {writable: false});
 
-        TW.Runtime.Widgets[name] = subclass;
-        return subclass;
+        TW.IDE.Widgets[name] = widget;
     }
 }
 
@@ -316,18 +290,8 @@ export function TWNamedRuntimeWidget(name) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        var prototype = widget.prototype;
-        function subclass() {
-            widget.apply(this, arguments);
-        }
-        Object.defineProperty(subclass, 'prototype', {
-            get() {
-                return prototype;
-            },
-            set() {}
-        });
+        Object.defineProperty(widget, 'prototype', {writable: false});
 
-        TW.Runtime.Widgets[name] = subclass;
-        return subclass;
+        TW.Runtime.Widgets[name] = widget;
     }
 }
