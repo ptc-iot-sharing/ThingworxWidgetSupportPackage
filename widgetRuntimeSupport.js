@@ -299,7 +299,7 @@ export function TWNamedComposerWidget(name) {
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
-        TW.IDE.Widgets[widget.name] = function () {
+        TW.IDE.Widgets[name] = function () {
             return new widget;
         }
     }
@@ -322,7 +322,7 @@ export function TWNamedRuntimeWidget(name) {
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
-        TW.Runtime.Widgets[widget.name] = function () {
+        TW.Runtime.Widgets[name] = function () {
             return new widget;
         }
     }
