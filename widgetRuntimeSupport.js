@@ -240,9 +240,6 @@ if (typeof TW.Widget == 'function') {
     })();
 }
 
-if (typeof TW.Widget.factory != 'undefined') TW.Widget.factory = eval(TW.Widget.factory.toString());
-if (typeof TW.Widget.factoryWithProperties != 'undefined') TW.Widget.factoryWithProperties = eval(TW.Widget.factoryWithProperties.toString());
-
 /**
  * Makes the given widget class available to Thingworx.
  * @param widget        The widget class to export.
@@ -251,9 +248,17 @@ export function ThingworxRuntimeWidget(widget) {
     // Thingworx attempts to change the prototype of the custom widget constructor
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
-    Object.defineProperty(widget, 'prototype', {writable: false});
-
-    TW.Runtime.Widgets[widget.name] = widget;
+    
+    // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
+    // functions now run in strict mode and crash when attempting to write to the read-only prototype
+    // property
+    //Object.defineProperty(widget, 'prototype', {writable: false});
+    
+    // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
+    // instance when invoked
+    TW.Runtime.Widgets[widget.name] = function () {
+        return new widget;
+    }
 }
 
 /**
@@ -261,9 +266,20 @@ export function ThingworxRuntimeWidget(widget) {
  * @param widget        The widget class to export.
  */
 export function ThingworxComposerWidget(widget) {
-    Object.defineProperty(widget, 'prototype', {writable: false});
-
-    TW.IDE.Widgets[widget.name] = widget;
+    // Thingworx attempts to change the prototype of the custom widget constructor
+    // which in addition to being a bad practice, prevents the usual prototype-based inheritance
+    // and prevents using the class-based syntax
+    
+    // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
+    // functions now run in strict mode and crash when attempting to write to the read-only prototype
+    // property
+    //Object.defineProperty(widget, 'prototype', {writable: false});
+    
+    // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
+    // instance when invoked
+    TW.IDE.Widgets[widget.name] = function () {
+        return new widget;
+    }
 }
 
 /**
@@ -274,10 +290,18 @@ export function TWNamedComposerWidget(name) {
     return function (widget) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
-        // and prevents using the class-based syntaxvar prototype = widget.prototype;
-        Object.defineProperty(widget, 'prototype', {writable: false});
+        // and prevents using the class-based syntax
 
-        TW.IDE.Widgets[name] = widget;
+        // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
+        // functions now run in strict mode and crash when attempting to write to the read-only prototype
+        // property
+        //Object.defineProperty(widget, 'prototype', {writable: false});
+
+        // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
+        // instance when invoked
+        TW.IDE.Widgets[widget.name] = function () {
+            return new widget;
+        }
     }
 }
 
@@ -290,8 +314,16 @@ export function TWNamedRuntimeWidget(name) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        Object.defineProperty(widget, 'prototype', {writable: false});
 
-        TW.Runtime.Widgets[name] = widget;
+        // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
+        // functions now run in strict mode and crash when attempting to write to the read-only prototype
+        // property
+        //Object.defineProperty(widget, 'prototype', {writable: false});
+
+        // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
+        // instance when invoked
+        TW.Runtime.Widgets[widget.name] = function () {
+            return new widget;
+        }
     }
 }
