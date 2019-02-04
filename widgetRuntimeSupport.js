@@ -252,7 +252,7 @@ export function ThingworxRuntimeWidget(widget) {
     // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
     // functions now run in strict mode and crash when attempting to write to the read-only prototype
     // property
-    //Object.defineProperty(widget, 'prototype', {writable: false});
+    Object.defineProperty(widget, 'prototype', {writable: false});
     
     // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
     // instance when invoked
@@ -273,7 +273,7 @@ export function ThingworxComposerWidget(widget) {
     // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
     // functions now run in strict mode and crash when attempting to write to the read-only prototype
     // property
-    //Object.defineProperty(widget, 'prototype', {writable: false});
+    Object.defineProperty(widget, 'prototype', {writable: false});
     
     // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
     // instance when invoked
@@ -295,7 +295,7 @@ export function TWNamedComposerWidget(name) {
         // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
         // functions now run in strict mode and crash when attempting to write to the read-only prototype
         // property
-        //Object.defineProperty(widget, 'prototype', {writable: false});
+        Object.defineProperty(widget, 'prototype', {writable: false});
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
@@ -318,7 +318,7 @@ export function TWNamedRuntimeWidget(name) {
         // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
         // functions now run in strict mode and crash when attempting to write to the read-only prototype
         // property
-        //Object.defineProperty(widget, 'prototype', {writable: false});
+        Object.defineProperty(widget, 'prototype', {writable: false});
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
