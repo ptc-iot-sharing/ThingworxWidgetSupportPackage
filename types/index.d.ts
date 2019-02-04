@@ -1001,19 +1001,21 @@ declare abstract class TWRuntimeWidget extends TWWidget {
     /**
      * Should be overriden by subclasses to handle bound property updates.
      * Note that when properties are updated this way, the actual value of the property
-     * isn't automatically updated. It is the developer's reponsability to update the
+     * isn't automatically updated. It is the developer's reponsibility to update the
      * property's value in response to this update.
+     * When using decorators, implementing this method becomes optional.
      * @param info      An object containing information about the updated property.
      */
-    abstract updateProperty(info: TWUpdatePropertyInfo): void;
+    updateProperty(info: TWUpdatePropertyInfo): void;
 
     /**
      * Invoked by the platform when any of this widget's services is invoked.
      * Subclasses should override this method to perform the necessary actions
      * to execute that service.
+     * When using decorators, implementing this method becomes optional.
      * @param name      The name of the service that was invoked.
      */
-    abstract serviceInvoked(name: string): void;
+    serviceInvoked(name: string): void;
 
     /**
      * Invoked by the platform when this widget's DOM node is resized.
@@ -1196,7 +1198,9 @@ declare abstract class TWRuntimeWidget extends TWWidget {
     destroy(): void;
 
     /**
-     * This method may optionally be overriden by subclasses to free up any resources prior to destruction.
+     * This method should be overriden by subclasses to free up any resources prior to destruction.
+     * Subclasses overriding this method must invoke the superclass implementation at the end of their
+     * own implementation.
      */
     abstract beforeDestroy?(): void;
 
