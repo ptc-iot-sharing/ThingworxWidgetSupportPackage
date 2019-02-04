@@ -6,7 +6,7 @@ declare module 'typescriptwebpacksupport' {
      * The class member to which this descriptor is applied should not have a getter. If it does, it will be replaced
      * by this decorator.
      */
-    export function TWProperty(name: any): (target: any, key: any, descriptor: any) => void;
+    export function TWProperty(name: any): (target: any, key: any, descriptor?: any) => void;
     /**
      * Returns a decorator that binds the class method it is applied to to the given widget service.
      * When this decorator is used, `serviceInvoked` becomes optional.
