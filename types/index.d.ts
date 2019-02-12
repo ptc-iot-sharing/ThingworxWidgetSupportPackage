@@ -2,6 +2,8 @@
 /** inspector files module types */
 /// <reference path="./widgetRuntimeSupport.d.ts" />
 
+declare class JQuery {}
+
 /**
  * An interface representing an object whose key values are constrained to a generic type.
  */
@@ -1203,6 +1205,610 @@ declare abstract class TWRuntimeWidget extends TWWidget {
      * own implementation.
      */
     abstract beforeDestroy?(): void;
+
+}
+
+/**
+ * Represents a type containing the properties shared by all Thingworx entities returned by HTTP requests.
+ */
+declare abstract class TWEntityDefinition {
+    /**
+     * A dictionary of entity-specific aspects.
+     */
+    aspects: Dictionary<any>;
+
+    /**
+     * The avatar image representing this entity.
+     */
+    avatar: string;
+
+    columns: number;
+    configurationTables: any;
+    designTimePermissions: any;
+    documentationContent: string;
+    homeMashup: string;
+    lastModifiedDate: number;
+    name: string;
+    owner: any;
+    projectName: any;
+    rows: number;
+    runTimePermissions: any;
+    tags: any[];
+    thingShapes: any[];
+    thingTemplates: any[];
+    things: any[];
+    visibilityPermissions: any[];
+}
+
+/**
+ * Represents the definition of a mashup entity.
+ * Contains the additional entity fields specific to mashups.
+ */
+declare abstract class TWMashupEntityDefinition extends TWEntityDefinition {
+
+    /**
+     * Contains the actual mashup content serialized to a string.
+     * `JSON.parse` should be used on this property to obtain a usable version of the contents.
+     */
+    mashupContent: string;
+}
+
+/**
+ * An object which represents the definition of a platform service that may be invoked
+ * from the mashup data sources.
+ */
+declare interface TWMashupServiceDefinition {
+    /**
+     * A unique identifier for this service.
+     * For custom services this will be a GUID string.
+     */
+    Id: string;
+
+    /**
+     * The API method to use when invoking the service.
+     * This is typically set to 'POST'.
+     */
+    APIMethod: string;
+
+    /**
+     * Typically set to 'Services'.
+     */
+    Characteristic: string;
+
+    /**
+     * The name of the service as it appears in the composer.
+     */
+    Name: string;
+
+    /**
+     * The name of the service that is invoked in the platform.
+     */
+    Target: string;
+
+    /**
+     * Typically set to 0.
+     */
+    RefreshInterval: number;
+
+    /**
+     * Typically set to an empty object.
+     */
+    Parameters: any;
+}
+
+/**
+ * An object which represents a data source for a mashup.
+ */
+declare interface TWMashupDataSource {
+    /**
+     * A unique identifier for this data source.
+     * For custom data sources this will be a GUID string.
+     */
+    Id: string;
+
+    /**
+     * The name of this data source as it appears in the composer.
+     */
+    DataName: string;
+
+    /**
+     * The name of the entity representing this data source.
+     * For built-in data sources such as the session object, this will be an empty string.
+     */
+    EntityName: string;
+
+    /**
+     * A string representing the entity collection type of this data source, such as 'Things'.
+     */
+    EntityType: string;
+
+    /**
+     * An array of services exposed by this data source.
+     */
+    Services: TWMashupServiceDefinition[];
+}
+
+/**
+ * An object representing an event binding that occurs in a mashup.
+ * This specifies what service to invoke in response to an event occurring.
+ */
+declare interface TWMashupEventTriggerDefinition {
+
+    /**
+     * A randomly generated GUID string uniquely identifying this binding.
+     */
+    Id: string;
+
+    /**
+     * Represents the area in which the triggering event is defined.
+     * This will be either 'Mashup', 'UI' or 'Data'.
+     */
+    EventTriggerArea: string;
+
+    /**
+     * Represents the name of the occurring event.
+     */
+    EventTriggerEvent: string;
+
+    /**
+     * Represents the identifier of the object which will trigger the event.
+     * For 'Mashup' areas this will be 'mashup-root'.
+     * For 'UI' areas this will be the ID of the triggering widget.
+     * For 'Data' areas this will be the name of the triggering service.
+     */
+    EventTriggerId: string;
+
+    /**
+     * Represents the container of the triggering object.
+     * This will be an empty string for 'Mashup' and 'UI' areas and the name
+     * of the entity for 'Data' areas.
+     */
+    EventTriggerSection: string;
+
+    /**
+     * Represents the area in which the triggered action is defined.
+     * This will be either 'Mashup', 'UI' or 'Data'.
+     */
+    EventHandlerArea: string;
+
+    /**
+     * Represents the identifier of the object on which the action will be triggered.
+     * For 'Mashup' areas this will be 'mashup-root'.
+     * For 'UI' areas this will be the ID of the triggered widget.
+     * For 'Data' areas this will be the name of the triggered service.
+     */
+    EventHandlerId: string;
+
+    /**
+     * Represents the name of the triggered action.
+     * This will be the entity service name for the 'Data' area and the
+     * name of the widget service for the 'UI' or 'Mashup' areas.
+     */
+    EventHandlerService: string;
+}
+
+
+/**
+ * An object representing a data binding that occurs in a mashup.
+ * This specifies the source and source property and the target and target property of a data binding.
+ */
+declare interface TWMashupDataBindingDefinition {
+
+    /**
+     * A randomly generated GUID string uniquely identifying this binding.
+     */
+    Id: string;
+
+    /**
+     * Represents the area in which the data source is defined.
+     * This will be either 'Mashup', 'UI' or 'Data'.
+     */
+    SourceArea: string;
+
+    /**
+     * Defined when the source data is an infotable that can have selected rows.
+     * In other cases this property will not exist.
+     * If it exists its value will either be 'AllData' or 'SelectedRows'.
+     */
+    SourceDetails?: string;
+
+    /**
+     * The ID of the data source. This will be the service name for the 'Data' area and 
+     * the widget ID for other areas.
+     */
+    SourceId: string;
+
+    /**
+     * Represents the container of the data source.
+     * This will be an empty string for 'Mashup' and 'UI' areas and the name
+     * of the entity for 'Data' areas.
+     */
+    SourceSection: string;
+
+    /**
+     * Represents the area in which the data target is defined.
+     * This will be either 'Mashup', 'UI' or 'Data'.
+     */
+    TargetArea: string;
+
+    /**
+     * The ID of the data target. This will be the service name for the 'Data' area and 
+     * the widget ID for other areas.
+     */
+    TargetId: string;
+
+    /**
+     * Represents the container of the data target.
+     * This will be an empty string for 'Mashup' and 'UI' areas and the name
+     * of the entity for 'Data' areas.
+     */
+    TargetSection: string;
+
+    /**
+     * Contains an array of properties affected by this binding.
+     */
+    PropertyMaps: TWMashupPropertyBindingDefinition[];
+}
+
+
+
+/**
+ * An object representing a property binding that occurs in a mashup.
+ * This specifies the source and source property and the target and target property of a data binding.
+ */
+declare interface TWMashupPropertyBindingDefinition {
+    
+    /**
+     * The name of the source property.
+     */
+    SourceProperty: string;
+
+    /**
+     * The baseType of the source property.
+     */
+    SourcePropertyBaseType: TWBaseType;
+
+    /**
+     * If defined, this represents the type of the source property. The value of this field will be (incomplete list):
+     *  * 'Field' for fields of infotable properties.
+     *  * 'Property' or 'property' for widget properties.
+     *  * 'InfoTable' when the data source represents the entire infotable result of a service.
+     */
+    SourcePropertyType?: string;
+    
+    /**
+     * The name of the target property.
+     */
+    TargetProperty: string;
+
+    /**
+     * The baseType of the target property.
+     */
+    TargetPropertyBaseType: TWBaseType;
+
+
+    /**
+     * If defined, this represents the type of the target property. The value of this field will be (incomplete list):
+     *  * 'Field' for fields of infotable properties.
+     *  * 'Property' or 'property' for widget properties.
+     *  * 'Paremeter' for service parameters.
+     */
+    TargetPropertyType?: string;
+}
+
+/**
+ * Represents an object containing the values of a widget's properties.
+ * These are used to create an actual widget instance.
+ * 
+ * In addition to this interface's properties objects of this type will also include
+ * all of the widget's custom properties.
+ */
+declare interface TWMashupWidgetPropertiesDefinition {
+
+    /**
+     * The widget's area. This will always be 'UI' except for the root widget whose
+     * area is 'Mashup'.
+     */
+    Area: string;
+
+    /**
+     * The ID of this widget.
+     */
+    Id: string;
+
+    /**
+     * This widget's display name.
+     */
+    DisplayName: string;
+
+    /**
+     * The name of this widget's class. This is used when creating the widget - this name represents the name
+     * of the constructor function that Thingworx will use to instantiate the widget.
+     */
+    Type: string;
+
+    /**
+     * The label of the widget's type.
+     */
+    __TypeDisplayName: string;
+
+    [key: string]: any;
+}
+
+/**
+ * An object containing the JSON representation of a widget instance.
+ * Note that this class does not represent an actual widget, but rather the information required in order to create
+ * the widget itself.
+ */
+declare interface TWMashupWidgetDefinition {
+
+    /**
+     * An object containing the values of this widget's properties.
+     */
+    Properties: TWMashupWidgetPropertiesDefinition;
+
+    /**
+     * An array containing this widget's child widgets.
+     */
+    Widgets: TWMashupWidgetDefinition[];
+}
+
+/**
+ * An object containing the JSON representation of a mashup.
+ * Note that this class does not represent an actual mashup, but rather the information required in order to create 
+ * the mashup itself.
+ */
+declare abstract class TWMashupDefinition {
+
+    /**
+     * Only available in Thingworx 8.2 and newer.
+     * A string containing the custom CSS written for this mashup in new composer.
+     */
+    CustomMashupCss?: string;
+
+    /**
+     * Represents the mashup type.
+     * Typically, the value of this property is 'mashup'.
+     */
+    mashupType: string;
+
+    /**
+     * A dictionary of data sources used by this mashup.
+     */
+    Data: Dictionary<TWMashupDataSource>;
+
+    /**
+     * An array of data bindings within this mashup.
+     */
+    DataBindings: TWMashupDataBindingDefinition[];
+
+    DesignTimePermissions: any;
+
+    /**
+     * An array of event bindings within this mashup.
+     */
+    Events: TWMashupEventTriggerDefinition[];
+
+    RunTimePermissions: any;
+
+    /**
+     * The root widget of this mashup.
+     */
+    UI: TWMashupWidgetDefinition;
+}
+
+/**
+ * The data manager is an object used by each mashup for invoking Thingworx services and dispatching
+ * events and data updates between the various elements that make up a mashup.
+ */
+declare abstract class TWDataManager {
+    addDataChangeSubscriber(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
+    addSelcetedRowsChangedEventSubscription(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
+    addSelectedRowsForWidgetHandleSelectionUpdateSubscription(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
+    beforePublishDataChange(binding: any, value: any): any;
+    beforePublishDataChangeFromServiceReturn(dataName: string, service: string, value: any): any;
+    beforePublishDataChangeFromWidget(area: string, widgetId: string, propertyName: string, value: any): any;
+    beforePublishDataChangeWithData(binding: any, value: any): any;
+    destroy(): any;
+    getPropertySubscriptions(): any;
+    getUpdatePropertyInfoFromBindingSource(dataBinding: any): any;
+    handleDataAdded(data: any): any;
+    handleSubscriptionOnDynamicEntity(oldEntityType: any, oldEntityName: any, def: any): any;
+    ignore_updateSelectionFromWidget: boolean;
+    indentLevel: number;
+    loadFromMashup(mashup: TWMashup): any;
+    migrateAnyBindings(mashup: TWMashup): any;
+    publishDataChange(binding: any, allDataOrSelectedRows: any): any;
+    publishDataChangeFromPropertyEvent(dataName: any, service: any, property: any, value: any): any;
+    publishDataChangeFromServiceReturn(dataName: any, service: any, value: any): any;
+    publishDataChangeWithData(binding: any, value: any): any;
+    publishSelectionChange(binding: any, widgetJqElementId: any, selectedRowsCacheInfo: any, selectedRowIndices: any, preventEventTrigger: any): any;
+    resetServicesForMashupReuse(Data: any): any;
+    sessionSubscriptions: any[];
+    setupInitialSubscriptions(): any;
+    subscribeToProperty(sourceSection: any, entityType: any, entityName: any, propName: any): any;
+    subscribers: Dictionary<any>;
+    unsubscribeFromEntity(def: any): any;
+    updateSelectionFromWidget(widgetId: any, propertyName: any, mashupId: any, widgetJqElementId: any, selectedRowIndices: any, preventEventTrigger: any): any;
+
+}
+
+/**
+ * An object type representing the definition for a mashup parameter.
+ */
+declare interface TWMashupParameterDefinition {
+
+    /**
+     * The parameter's base type.
+     */
+    BaseType: TWBaseType;
+
+    /**
+     * The parameter's name.
+     */
+    ParameterName: string;
+
+    /**
+     * The parameter's description.
+     */
+    Description: string;
+
+    /**
+     * Only set for infotable parameters.
+     * Contains the name of the data shape and the type of the infotable.
+     */
+    Aspects?: {
+
+        /**
+         * The name of the data shape.
+         */
+        dataShape: string;
+
+        /**
+         * Should be set to true if the parameter represents a stream entry.
+         * If set to true, the infotable will gain the typical stream entry fields in addition
+         * to the ones defined in the data shape.
+         */
+        isStreamEntry?: boolean;
+
+        /**
+         * Should be set to true if the parameter represents a data table entry.
+         * If set to true, the infotable will gain the typical data table entry fields in addition
+         * to the ones defined in the data shape.
+         */
+        isDataTableEntry?: boolean;
+
+    }
+
+}
+
+/**
+ * A class that represents a controller that manages a page or section of a page.
+ * The mashup is responsible for creating and managing widgets, invoking services and handling bindings.
+ */
+declare abstract class TWMashup extends TWMashupDefinition {
+
+    /**
+     * Invoked to add CSS styles to this mashup.
+     * These will be added to the mashup's own style block.
+     * Whenver styles are added in this way, the `updateStyles()` method must be invoked
+     * to actually publish the udpated style to the document.
+     * @param styles A string of CSS style rules that will be added to the page.
+     */
+    addStyles(styles: string): void;
+
+    /**
+     * The data manager managing service invocations and bindings for this mashup.
+     */
+    dataMgr: TWDataManager;
+
+    /**
+     * Should be invoked to destroy this mashup and all of its widgets and sub-components.
+     * This will also remove this mashup's DOM element from the document.
+     */
+    destroyMashup(): void;
+
+    /**
+     * Returns an array of data binding definitions that have the given Id and areas as targets.
+     * @param targetArea The target area.
+     * @param targetId The target id.
+     * @return An array of data bindings matching the given criteria.
+     */
+    findDataBindingsByTargetAreaAndId(targetArea: string, targetId: string): TWMashupDataBindingDefinition[];
+
+    /**
+     * Causes the 'MashupLoaded' event to trigger.
+     */
+    fireMashupLoadedEvent(): void;
+
+    /**
+     * Used to verify if the 'MashupLoaded' event has been triggered.
+     */
+    hasMashupLoadedBeenFired: boolean;
+
+    /**
+     * The CSS selector of this mashup's DOM element.
+     */
+    htmlIdOfMashup: string;
+
+    /**
+     * Set to `true` for dashboard mashups, `false` otherwise.
+     */
+    isDashboardMashup: string;
+
+    /**
+     * Initializes this mashup with the configuration of the specified JSON representation.
+     * @param json The mashup content string. When parsed, the resulting object should conform to the `TWMashupDefinition` interface.
+     * @param data The mashup entity.
+     * @return This mashup.
+     */
+    loadFromJSON(json: string, data: TWMashupEntityDefinition): TWMashup;
+
+    /**
+     * The name of the mashup.
+     */
+    mashupName: string;
+
+    /**
+     * An object containing the parameters defined for this mashup.
+     * This object's key names are typically the same as the parameter names.
+     */
+    mashupParameterDefinitions: Dictionary<TWMashupParameterDefinition>;
+
+    /**
+     * An array of triggers to invoke after this mashup loads. This only populated while triggers
+     * are invoked while the mashup is loading. In that case, they are delayed until after the mashup
+     * has finished loading.
+     */
+    mashupTriggersToFireAfterLoad: string[];
+
+    /**
+     * Should be invoked to reset all service results and widgets to their default values.
+     * Service results will be set to blank and this will invoke the `ResetInputsToDefaultValue` method on
+     * all contained widgets.
+     */
+    resetServicesAndInputsToDefaultValue(): void;
+
+    /**
+     * The name of the root widget.
+     */
+    rootName: string;
+
+    /**
+     * The root widget.
+     */
+    rootWidget: TWRuntimeWidget;
+
+    /**
+     * Updates the value of the given parameter to the given value.
+     * @param parameterName The name of the parameter to update.
+     * @param parameterValue The new value to assign to the parameter.
+     */
+    setParameter(parameterName: string, parameterValue: any);
+
+    /**
+     * Invoked internally by the platform whenever any property is updated as a result of a binding.
+     * This updates standard properties and then hands off the update to the regular `updateProperty()` method.
+     * @param updatePropertyInfo An object containing information about what was updated.
+     */
+    standardUpdateProperty(updatePropertyInfo: TWUpdatePropertyInfo);
+
+    /**
+     * A unique identifier string associated with this mashup.
+     */
+    uniqueMashupEventNamespace: string;
+
+    /**
+     * Handles updates to properties that are the result of a binding.
+     * @param updatePropertyInfo An object containing information about what was updated.
+     */
+    updateProperty(updatePropertyInfo: TWUpdatePropertyInfo);
+
+    /**
+     * Updates this mashup's style block to include the latest styles that were added through
+     * the `addStyles()` method.
+     */
+    updateStyles(): void;
 
 }
 
