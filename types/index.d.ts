@@ -189,7 +189,7 @@ type TWBaseType = 'STRING' | 'LOCATION' | 'NUMBER' | 'INTEGER' | 'LONG' | 'BOOLE
     'MASHUPNAME' | 'MENUNAME' | 'PASSWORD' | 'TEXT' | 'THINGCODE' | 'THINGNAME' |
     'USERNAME' | 'DATETIME' | 'XML' | 'JSON' | 'QUERY' | 'TAGS' |
     'SCHEDULE' | 'ANYSCALAR' | 'BLOB' | 'THINGSHAPENAME' | 'THINGTEMPLATENAME' | 'DATASHAPENAME' |
-    'PROJECTNAME' | 'BASETYPENAME' | 'STATEDEFINITION' | 'STYLEDEFINITION' | 'FIELDNAME' | 'INFOTABLE' | 'STATEFORMATTING';
+    'PROJECTNAME' | 'BASETYPENAME' | 'STATEDEFINITION' | 'STYLEDEFINITION' | 'FIELDNAME' | 'INFOTABLE' | 'STATEFORMATTING' | 'RENDERERWITHSTATE';
 
 /**
  * The prototype for an object representing a single widget property.
@@ -459,9 +459,10 @@ declare abstract class TWWidget {
      * Returns the current value of the given property.
      * Subclasses are expected to not override this method.
      * @param property          The name of the property.
+     * @param defaultValue      An optional default value that will be returned if the property has not yet been assigned any value.
      * @return                  The property's value.
      */
-    getProperty(property: string): any;
+    getProperty(property: string, defaultValue?: any): any;
 
     /**
      * Sets the value of the given property.
@@ -497,6 +498,10 @@ declare abstract class TWWidget {
  * This is the IDE variant of the widget type
  */
 declare abstract class TWComposerWidget extends TWWidget {
+
+    parentWidget: TWComposerWidget | undefined;
+
+    widgets: TWComposerWidget[] | undefined;
 
     /**
      * Returns a string representing the HTML content managed by this widget.
@@ -572,7 +577,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @return          The corresponding infotable. This may either be the name of an existing data shape
      *                  defined in the platform, or an object describing the data shape.
      */
-    getSourceDatashapeName?(name: string): string | TWDataShape;
+    getSourceDatashapeName?(name: string): string | Dictionary<TWFieldDefinition>;
 
     /**
      * This method is invoked by the platform to retrieve the data shape corresponding to
@@ -584,7 +589,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @return          The corresponding infotable. This may either be the name of an existing data shape
      *                  defined in the platform, or an object describing the data shape.
      */
-    getSourceDatashape?(name: string): string | TWDataShape | Dictionary<TWFieldDefinition>;
+    getSourceDatashape?(name: string): string | TWDataShape;
 
     /**
      * Shows this widget's bounding box, if it was hidden.
@@ -652,9 +657,9 @@ declare abstract class TWComposerWidget extends TWWidget {
      * from this method will cause the mashup builder to re-render the widget.
      * @param name                  The property's name.
      * @param value                 The property's new value.
-     * @return              `true` if this property change should cause a redraw, false or undefined otherwise.
+     * @return                      `true` if this property change should cause a redraw, false or undefined otherwise.
      */
-    afterSetProperty?(name: string, value: any): boolean;
+    afterSetProperty?(name: string, value: any): boolean | undefined;
 
     /**
      * Initializes this widget and adds its content to the page.
@@ -698,6 +703,13 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @param updateUi      Defaults to false. Should be set to true to update the properties panel for this widget when it is selected.
      */
     updateProperties({ updateUi }?: { updateUi?: boolean }): void;
+
+    /**
+     * Should be invoked after the property structure of this widget has been updated and the
+     * properties table should be updated.
+     * Subclasses are expected to not override this method.
+     */
+    updatedProperties(): void;
 
     /**
      * Returns the JSON representation of this widget.
@@ -755,7 +767,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * Whenever the array returned by this method is mutated, `updatedProperties` should be invoked
      * to update the widget's internal state.
      * Subclasses are expected to not override this method.
-     * @return          The widget property info
+     * @return          An array of property definitions.
      */
     allWidgetProperties(): TWWidgetProperties;
 
@@ -834,7 +846,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @param name      The name of the property.
      * @return          The property definition if available.
      */
-    getWidgetMetadata(name: string): TWWidgetProperty;
+    getWidgetMetadata(name: string): TWWidgetProperty | undefined;
 
     /**
      * Returns the property attribute value for the given property, or the default value if the property definition does not provide it.
@@ -842,7 +854,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @param attribute     The name of the attribute.
      * @return              The property definition if available.
      */
-    getWidgetPropertyMetadata(name: string, attribute: string): TWWidgetProperty;
+    getWidgetPropertyMetadata(name: string, attribute: string): TWWidgetProperty | undefined;
 
     /**
      * Invoked internally to mark the mashup as dirty and update its internal state.
@@ -907,14 +919,13 @@ declare abstract class TWComposerWidget extends TWWidget {
      */
     getWidgetIds(IDs: { [key: string]: number }): void;
 
+    /**
+     * Returns the data shape definition for the given property, if it is a bound infotable property.
+     * @param propertyName The name of the property.
+     */
+    getInfotableMetadataForProperty(propertyName: string): Dictionary<TWFieldDefinition> | undefined;
+
 }
-
-
-
-/**
- * A class that represents a controller that manages a page or section of a page.
- */
-type TWMashup = any;
 
 
 
@@ -923,6 +934,18 @@ type TWMashup = any;
  * This is the Runtime variant of the widget type
  */
 declare abstract class TWRuntimeWidget extends TWWidget {
+
+    /**
+     * A property that is initialized to the automatically generated ID
+     * of the widget element.
+     */
+    idOfThisElement: string;
+
+    /**
+     * A property that is initialized to the automatically generated ID
+     * of the widget element.
+     */
+    jqElementId: string;
 
     /**
      * Returns a string representing the HTML content managed by this widget.
@@ -959,14 +982,14 @@ declare abstract class TWRuntimeWidget extends TWWidget {
      * @param defaultValue      Defaults to `undefined`. An optional default value to return if this property doesn't yet have a value.
      * @return                  The property's value, or the value specified in the `defaultValue` parameter if the property hasn't yet been set.
      */
-    getProperty(name: string, defaultValue?: any): any;
+    getProperty(name: string, defaultValue?: any | undefined): any | undefined;
 
     /**
      * Sets the value of the given property.
      * @param name          The name of the property.
      * @param value         The new value to assign to the property. This value's type should match the property's base type.
      */
-    setProperty(name: string, value?: any): void;
+    setProperty(name: string, value?: any): void | undefined;
 
     /**
      * Globally updates the selection of the given infotable property.
@@ -978,7 +1001,7 @@ declare abstract class TWRuntimeWidget extends TWWidget {
      * @param preventEventTrigger       Defaults to false. If set to true, this update will not trigger the
      *                                  `SelectedRowsChanged` event of the service whose selection will be updated.
      */
-    updateSelection(property: string, selectedRowIndices: number[], preventEventTrigger?: boolean): void;
+    updateSelection(property: string, selectedRowIndices: number[], preventEventTrigger?: boolean | undefined): void;
 
     /**
      * Invoked by the platform when the selection for one of this widget's bound infotable properties
@@ -1139,18 +1162,18 @@ declare abstract class TWRuntimeWidget extends TWWidget {
     showPopup(
         mashupName: string,
         parameters: Dictionary<any>,
-        callback?: (() => void),
-        paramChangeCallback?: ((name: string, value: any) => void),
-        modal?: boolean,
-        popupTitle?: string,
-        fixedPopupWidth?: number,
-        fixedPopupHeight?: number,
-        modalPopupOpacity?: number,
-        isFullScreen?: boolean,
-        dialogId?: string,
-        showClose?: boolean,
-        clickOutsideToClose?: boolean,
-        dialogClass?: string
+        callback?: (() => void) | undefined,
+        paramChangeCallback?: ((name: string, value: any) => void) | undefined,
+        modal?: boolean | undefined,
+        popupTitle?: string | undefined,
+        fixedPopupWidth?: number | undefined,
+        fixedPopupHeight?: number | undefined,
+        modalPopupOpacity?: number | undefined,
+        isFullScreen?: boolean | undefined,
+        dialogId?: string | undefined,
+        showClose?: boolean | undefined,
+        clickOutsideToClose?: boolean | undefined,
+        dialogClass?: string | undefined
     ): void;
 
     /**
@@ -1182,7 +1205,7 @@ declare abstract class TWRuntimeWidget extends TWWidget {
      * @param pushState             Defaults to `false`. If set to `true`, the platform will create a history state for this
      *                              new mashup.
      */
-    replacePageMashup(mashupName: string, parameters: Dictionary<any>, thisPropertyId: string, pushState?: boolean);
+    replacePageMashup(mashupName: string, parameters: Dictionary<any>, thisPropertyId: string, pushState?: boolean | undefined);
 
     /**
      * Invoked by the platform to focus the first focusable element.
@@ -1823,7 +1846,7 @@ declare interface X {
     Runtime: {
         [prop: string]: any;
         Widget: typeof TWRuntimeWidget;
-        Widgets: Dictionary<typeof TW.IDE.Widget>;
+        Widgets: Dictionary<typeof TW.Runtime.Widget>;
     }
 }
 declare const TW: X;
