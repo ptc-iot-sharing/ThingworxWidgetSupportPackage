@@ -385,7 +385,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         if (this.constructor._aspects) {
                             let result = {};
                             for (let aspect in this.constructor._aspects) {
-                                result[aspect] = this.constructor._aspects;
+                                result[aspect] = this.constructor._aspects[aspect];
                             }
         
                             // this._decoratedProperties contains properties, events and
