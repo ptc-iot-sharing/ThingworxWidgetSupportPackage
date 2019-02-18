@@ -531,23 +531,32 @@ declare abstract class TWComposerWidget extends TWWidget {
     /**
      * Returns the properties object for this widget.
      * Subclasses must override this method and return the appropriate properties.
+     * When using decorators, implementing this method becomes optional. In this case, when
+     * overriden, the superclass implementation shuold be invoked to return the widget properties
+     * initialized from decorators and then modify the object returned from there.
      * @return          The properties object.
      */
-    abstract widgetProperties(): TWWidgetProperties;
+    widgetProperties(): TWWidgetProperties;
 
     /**
      * Returns the services object for this widget.
      * Subclasses must override this method and return the appropriate services.
+     * When using decorators, implementing this method becomes optional. In this case, when
+     * overriden, the superclass implementation shuold be invoked to return the widget services
+     * initialized from decorators and then modify the object returned from there.
      * @return          The properties object.
      */
-    abstract widgetServices(): Dictionary<TWWidgetService>;
+    widgetServices(): Dictionary<TWWidgetService>;
 
     /**
      * Returns the events object for this widget.
      * Subclasses must override this method and return the appropriate events.
+     * When using decorators, implementing this method becomes optional. In this case, when
+     * overriden, the superclass implementation shuold be invoked to return the widget events
+     * initialized from decorators and then modify the object returned from there.
      * @return          The properties object.
      */
-    abstract widgetEvents(): Dictionary<TWWidgetEvent>;
+    widgetEvents(): Dictionary<TWWidgetEvent>;
 
     /**
      * Invoked once, when an instance of this widget is first created.
