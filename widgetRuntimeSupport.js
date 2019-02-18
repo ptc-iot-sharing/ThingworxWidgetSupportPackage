@@ -126,7 +126,7 @@ export const localizable = TWPropertyAspect.aspectWithKeyAndValue('isLocalizable
  * When baseType is set to `'TAGS'` this makes the tag type be model tags. If this aspect is not specified,
  * the tag type will default to data tags.
  */
-export const tagType = WPropertyAspect.aspectWithKeyAndValue('isLocalizable', 'ModelTags');
+export const tagType = TWPropertyAspect.aspectWithKeyAndValue('isLocalizable', 'ModelTags');
 
 /**
  * Constructs and returns a property aspect that specifies what infotable the widget
