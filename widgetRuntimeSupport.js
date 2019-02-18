@@ -376,7 +376,63 @@ export function customEditorMenuText(value) {
 if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
     (function () {
         let TWWidgetConstructor = TW.IDE.Widget;
-        if (window.TWComposerWidget) return;
+        if (window.TWComposerWidget) {
+            if (!TWComposerWidget.prototype.widgetProperties) {
+                let prototype = {
+                    widgetProperties() {
+                        // If this widget was created with aspect decorators, assume that everything
+                        // else can be initialized by decorators
+                        if (this.constructor._aspects) {
+                            let result = {};
+                            for (let aspect in this.constructor._aspects) {
+                                result[aspect] = this.constructor._aspects;
+                            }
+        
+                            // this._decoratedProperties contains properties, events and
+                            // services together, so it has to be filtered to only return the properties
+                            result.properties = {};
+                            if (this._decoratedProperties) {
+                                for (let property in this._decoratedProperties) {
+                                    if (this._decoratedProperties[property].type == 'property') {
+                                        result.properties[property] = this._decoratedProperties[property];
+                                    }
+                                }
+                            }
+                            
+                            return result;
+                        }
+                    },
+        
+                    widgetServices() {
+                        var result = {};
+                        if (this._decoratedProperties) {
+                            for (let property in this._decoratedProperties) {
+                                if (this._decoratedProperties[property].type == 'service') {
+                                    result[property] = this._decoratedProperties[property];
+                                }
+                            }
+                        }
+                        return result;
+                    },
+        
+                    widgetEvents() {
+                        var result = {};
+                        if (this._decoratedProperties) {
+                            for (let property in this._decoratedProperties) {
+                                if (this._decoratedProperties[property].type == 'event') {
+                                    result[property] = this._decoratedProperties[property];
+                                }
+                            }
+                        }
+                        return result;
+                    }
+                };
+                TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
+                TWComposerWidget.prototype.widgetEvents = prototype.widgetEvents;
+                TWComposerWidget.prototype.widgetServices = prototype.widgetServices;
+            }
+            return;
+        }
         let __BMTWInternalState;
         let __BMTWArguments;
         TW.IDE.Widget = function () {
