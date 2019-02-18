@@ -216,7 +216,7 @@ export function property(baseType, ...args) {
             type: 'property'
         };
 
-        for (let arg of args) {
+        if (args) for (let arg of args) {
             target._decoratedProperties[key][arg._key] = arg._value;
         }
 
