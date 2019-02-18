@@ -92,8 +92,10 @@ export function TWService(name) {
  */
 class TWPropertyAspect {
     static aspectWithKeyAndValue(key, value) {
-        this._key = key;
-        this._value = value;
+        let aspect = new TWPropertyAspect();
+        aspect._key = key;
+        aspect._value = value;
+        return aspect;
     }
 }
 
@@ -283,8 +285,10 @@ export function description(description) {
  */
 class TWWidgetAspect {
     static aspectWithKeyAndValue(key, value) {
-        this._key = key;
-        this._value = value;
+        let aspect = new TWWidgetAspect();
+        aspect._key = key;
+        aspect._value = value;
+        return aspect;
     }
 }
 
