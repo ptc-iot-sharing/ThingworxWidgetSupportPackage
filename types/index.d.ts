@@ -1,8 +1,4 @@
-
-/** inspector files module types */
-/// <reference path="./widgetRuntimeSupport.d.ts" />
-
-declare class JQuery {}
+declare interface JQuery<T = HTMLElement> {}
 
 /**
  * An interface representing an object whose key values are constrained to a generic type.
