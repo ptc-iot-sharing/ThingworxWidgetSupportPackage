@@ -1,4 +1,4 @@
-declare module 'TWIDESupport' {
+declare module 'widgetidesupport' {
 
     /**
      * A class that represents a property aspect.

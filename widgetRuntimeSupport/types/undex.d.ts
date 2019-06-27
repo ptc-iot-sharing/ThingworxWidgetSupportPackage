@@ -1,4 +1,4 @@
-declare module 'TWRuntimeSupport' {
+declare module 'widgetruntimesupport' {
     /**
      * A class that represents a property aspect.
      */

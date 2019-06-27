@@ -1,0 +1,26 @@
+{
+  "name": "widgetruntimesupport",
+  "version": "1.0.5",
+  "description": "Helper functions to allow usage of typescript and webpack with thingworx widgets. Also includes typings for Thingworx",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage.git"
+  },
+  "keywords": [
+    "thingworx",
+    "widget",
+    "webpack"
+  ],
+  "author": "Petrisor Lacatus",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage/issues"
+  },
+  "homepage": "https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage#readme"
+}
