@@ -26,6 +26,10 @@ declare class TWPropertyAspect<T> {
  */
 export function willBind<T extends TWRuntimeWidget>(name: keyof T): TWPropertyAspect<T>;
 
+declare interface TWDidBindMethod {
+    (previousValue: any, info: TWUpdatePropertyInfo): void;
+}
+
 /**
  * Constructs and returns a property aspect that can be used to 
  * specify a method that will be invoked after the property has been updated because of a binding.
@@ -41,7 +45,7 @@ export function willBind<T extends TWRuntimeWidget>(name: keyof T): TWPropertyAs
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
  */
-export function didBind<T extends TWRuntimeWidget>(name: keyof T): TWPropertyAspect<T>;
+export function didBind<T extends TWRuntimeWidget, K extends keyof T>(name: T[K] extends TWDidBindMethod ? K : never): TWPropertyAspect<T>;
 
 /**
  * Returns a decorator that binds the class member it is applied to to a property definition.
