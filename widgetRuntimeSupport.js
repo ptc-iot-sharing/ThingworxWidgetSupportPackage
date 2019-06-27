@@ -1,4 +1,131 @@
 /**
+ * A class that represents a property aspect.
+ */
+class TWPropertyAspect {
+    static aspectWithKeyAndValue(key, value) {
+        let aspect = new TWPropertyAspect();
+        aspect._key = key;
+        aspect._value = value;
+        return aspect;
+    }
+}
+
+/**
+ * Constructs and returns a property aspect that can be used to 
+ * specify a method that can verify binding information before updating the property.
+ * 
+ * This must be the name of a method on the widget class that received the following parameters:
+ * - **`value`**:     Represents the value that is about to be assigned to the property.
+ * - **`info`**:      The complete `UpdatePropertyInfo` object.
+ * 
+ * The method must return a `boolean` that specify whether the binding update should occur or not.
+ * @param {string} name         The name of the method that will handle this.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function willBind(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('willBind', name);
+}
+
+/**
+ * Constructs and returns a property aspect that can be used to 
+ * specify a method that will be invoked after the property has been updated because of a binding.
+ * Unlike the regular setter, this method will not be invoked when the property is assigned normally.
+ * 
+ * When this method is invoked, the new value will have been assigned to the property.
+ * 
+ * This must be the name of a method on the widget class that received the following parameters:
+ * - **`previousValue`**:       Represents the property's previous value.
+ * - **`info`**:                The complete `UpdatePropertyInfo` object.
+ * 
+ * The method is not expected to return any value.
+ * @param {string} name         The name of the method that will handle this.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function didBind(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('didBind', name);
+}
+
+/**
+ * Constructs and returns a property aspect that can be used to 
+ * specify the name of the thingworx property which will be bound to this property.
+ * 
+ * If this aspect is not specified, the name of the class member will be used by default.
+ * @param {string} name         The name of the property.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function name(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('name', name);
+}
+
+/**
+ * A decorator that binds the given class member to a service with the same name.
+ * 
+ * Optionally, this function may be invoked with a string as its first parameter,
+ * in which case it will return a decorator that binds the given class member
+ * to the service with the specified name.
+ */
+export function service(arg1) {
+    let name = arg1;
+    const decorator = function (target, key, descriptor) {
+        var setter;
+        var hasDescriptor = (descriptor !== undefined);
+        if (!hasDescriptor) descriptor = {};
+
+        // Override the setter to call setProperty. It should also invoke the member's setter if it has one
+        if (descriptor.set) {
+            var previousSetter = descriptor.set;
+            setter = function (value) {
+                this.setProperty(name, value);
+                previousSetter.apply(this, arguments);
+            };
+        }
+        else {
+            setter = function (value) {
+                this.setProperty(name, value);
+            }
+        }
+        // set the newly created setter
+        descriptor.set = setter;
+
+        // Override the getter to return the result of calling getProperty
+        descriptor.get = function () {
+            return this.getProperty(name);
+        }
+
+        // Decorate updateProperty if a previous annotation hasn't already done it
+        if (!target._decoratedProperties) {
+            target._decoratedProperties = {};
+            var standardUpdateProperties = target.updateProperty;
+
+            if (standardUpdateProperties) {
+                target.updateProperty = function (info) {
+                    if (this._decoratedProperties[info.TargetProperty]) this[this._decoratedProperties[info.TargetProperty]] = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                    standardUpdateProperties.apply(this, arguments);
+                };
+            }
+            else {
+                target.updateProperty = function (info) {
+                    if (this._decoratedProperties[info.TargetProperty]) this[this._decoratedProperties[info.TargetProperty]] = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                };
+            }
+        }
+
+        // Add this automatic property to the internal binding map
+        target._decoratedProperties[name] = key;
+
+        if (!hasDescriptor) Object.defineProperty(target, key, descriptor);
+    }
+
+    if (typeof arg1 == 'string') {
+        return decorator;
+    }
+    else {
+        name = arguments[1];
+        decorator.apply(this, arguments);
+    }
+}
+
+/**
  * @deprecated Use property.
  * 
  * Returns a decorator that binds the class member it is applied to to the given widget property.
