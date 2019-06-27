@@ -1,4 +1,4 @@
-declare module 'typescriptwebpacksupport' {
+declare module 'TWIDESupport' {
 
     /**
      * A class that represents a property aspect.

@@ -1,4 +1,4 @@
-declare module 'typescriptwebpacksupport' {
+declare module 'TWRuntimeSupport' {
     /**
      * A class that represents a property aspect.
      */
