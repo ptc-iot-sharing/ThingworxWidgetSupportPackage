@@ -83,6 +83,77 @@ export function defaultValue(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('defaultValue', value);
 }
 
+
+/**
+ * Constructs and returns a property aspect that represents the name of a method that will be
+ * invoked when user sets a property value, but before it is actually updated.
+ * The method can be used to validate the new property value.
+ * 
+ * This must be the name of a method on the widget class that receives the following parameters:
+ * - **`value`**:     Represents the value that is about to be assigned to the property.
+ * 
+ * The method can return a `string` if the update should fail. The string returned by that method
+ * will be used as an error message displayed to the user that explains why the new value was rejected.
+ * @param {string} name         The name of the method that will handle this.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function willSet(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('_willSet', value);
+}
+
+/**
+ * Constructs and returns a property aspect that represents the name of a method that will be
+ * invoked when user sets a property value, after its value has been updated.
+ * The method can be used to react to the updated property or instruct Thingworx to redraw the widget.
+ * 
+ * This must be the name of a method on the widget class that receives the following parameters:
+ * - **`value`**:     Represents the value that has been assigned to the property.
+ * 
+ * The method can return a `boolean` that tells Thingworx whether the widget should be redrawn because of the update.
+ * @param {string} name         The name of the method that will handle this.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function didSet(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('_didSet', value);
+}
+
+/**
+ * Constructs and returns a property aspect that represents the name of a method that will be
+ * invoked when user adds a binding source to this property.
+ * The method can be used to react to the new binding.
+ * 
+ * This must be the name of a method on the widget class that will receive no parameters.
+ * 
+ * The method is not expected to return any value.
+ * @param {string} name         The name of the method that will handle this.
+ * @return {TWPropertyAspect}   A property aspect.
+ */
+export function didBind(name) {
+    return TWPropertyAspect.aspectWithKeyAndValue('_didBind', value);
+}
+
+const willSetSymbol = window.Symbol ? window.Symbol() : '@@_willSet';
+const didSetSymbol = window.Symbol ? window.Symbol() : '@@_didSet';
+const didBindSymbol = window.Symbol ? window.Symbol() : '@@_didBind';
+
+const _getInheritedProperty = function (proto, property) {
+    if (proto[property]) return proto[property];
+
+    const superproto = Object.getPrototypeOf(proto);
+
+    proto[property] = {};
+    for (const key in superproto[property]) {
+        proto[property][key] = superproto[property][key];
+    }
+
+    return proto[property];
+}
+
+const _getDecoratedProperties = proto => _getInheritedProperty(proto, '_decoratedProperties');
+const _getDecoratedWillSet = proto => _getInheritedProperty(proto, willSetSymbol);
+const _getDecoratedDidSet = proto => _getInheritedProperty(proto, didSetSymbol);
+const _getDecoratedDidBind = proto => _getInheritedProperty(proto, didBindSymbol);
+
 /**
  * Returns a decorator that marks the given property as a property definition. 
  * Getting or setting the affected property will then be routed through `getProperty` and `setProperty`.
@@ -119,7 +190,7 @@ export function property(baseType, ...args) {
 
         // Create the _decoratedProperties property if a previous annotation hasn't already done it
         if (!target._decoratedProperties) {
-            target._decoratedProperties = {};
+            target._decoratedProperties = _getDecoratedProperties(target);
         }
 
         // Add this automatic property to the internal binding map
@@ -128,8 +199,27 @@ export function property(baseType, ...args) {
             type: 'property'
         };
 
-        if (args) for (let arg of args) {
-            target._decoratedProperties[key][arg._key] = arg._value;
+        if (args) for (const arg of args) {
+            if (arg._key.startsWith('_')) {
+                // Underscore prefixed names are custom aspects that must be handled separately
+                switch (arg._key) {
+                    case '_willSet':
+                        target[willSetSymbol] = _getDecoratedWillSet(target);
+                        target[willSetSymbol][key] = arg._value;
+                        break;
+                    case '_didSet':
+                        target[didSetSymbol] = _getDecoratedDidSet(target);
+                        target[didSetSymbol][key] = arg._value;
+                        break;
+                    case '_didBind':
+                        target[didBindSymbol] = _getDecoratedDidBind(target);
+                        target[didBindSymbol][key] = arg._value;
+                        break;
+                }
+            }
+            else {
+                target._decoratedProperties[key][arg._key] = arg._value;
+            }
         }
 
         if (!hasDescriptor) Object.defineProperty(target, key, descriptor);
@@ -145,7 +235,7 @@ export function property(baseType, ...args) {
 export function service(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
     if (!target._decoratedProperties) {
-        target._decoratedProperties = {};
+        target._decoratedProperties = _getDecoratedProperties(target);
     }
 
     // Add this automatic property to the internal binding map
@@ -163,7 +253,7 @@ export function service(target, key, descriptor) {
 export function event(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
     if (!target._decoratedProperties) {
-        target._decoratedProperties = {};
+        target._decoratedProperties = _getDecoratedProperties(target);
     }
 
     // Add this automatic property to the internal binding map
@@ -293,6 +383,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
             if (!TWComposerWidget.prototype.widgetProperties) {
+                // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
                         // If this widget was created with aspect decorators, assume that everything
@@ -340,11 +431,32 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                             }
                         }
                         return result;
+                    },
+
+                    beforeSetProperty(key, value) {
+                        if (this.constructor[willSetSymbol] && (key in this.constructor[willSetSymbol])) {
+                            return this[this.constructor[willSetSymbol][key]](value);
+                        }
+                    },
+
+                    afterSetProperty(key, value) {
+                        if (this.constructor[didSetSymbol] && (key in this.constructor[didSetSymbol])) {
+                            return this[this.constructor[didSetSymbol][key]](value);
+                        }
+                    },
+
+                    afterAddBindingSource(info) {
+                        if (this.constructor[didbindSymbol] && (info.targetProperty in this.constructor[didbindSymbol])) {
+                            return this[this.constructor[didbindSymbol][info.targetProperty]](info);
+                        }
                     }
                 };
                 TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
                 TWComposerWidget.prototype.widgetEvents = prototype.widgetEvents;
                 TWComposerWidget.prototype.widgetServices = prototype.widgetServices;
+                TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
+                TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
+                TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
             }
             return;
         }
@@ -485,6 +597,24 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     }
                 }
                 return result;
+            },
+
+            beforeSetProperty(key, value) {
+                if (this.constructor[willSetSymbol] && (key in this.constructor[willSetSymbol])) {
+                    return this[this.constructor[willSetSymbol][key]](value);
+                }
+            },
+
+            afterSetProperty(key, value) {
+                if (this.constructor[didSetSymbol] && (key in this.constructor[didSetSymbol])) {
+                    return this[this.constructor[didSetSymbol][key]](value);
+                }
+            },
+
+            afterAddBindingSource(info) {
+                if (this.constructor[didbindSymbol] && (info.targetProperty in this.constructor[didbindSymbol])) {
+                    return this[this.constructor[didbindSymbol][info.targetProperty]](info);
+                }
             }
         };
     })();
@@ -509,15 +639,29 @@ export function TWWidgetDefinition(name, ...args) {
         // property
         Object.defineProperty(widget, 'prototype', {writable: false});
 
-        // Store the aspects as a static member of the class
+        // Ensure that decorated properties are copied over correctly
+        _getDecoratedProperties(widget.prototype);
+        _getDecoratedWillSet(widget.prototype);
+        _getDecoratedDidSet(widget.prototype);
+        _getDecoratedDidBind(widget.prototype);
+
+        // Copy over the decorations from the superclass
+        const superclass = Object.getPrototypeOf(this).constructor;
+
         let aspects = {};
 
+        for (const key in (superclass._aspects || {})) {
+            aspects[key] = superclass._aspects[key];
+        }
+
+        // Add own aspects
         if (args) for (let arg of args) {
             aspects[arg._key] = arg._value;
         }
 
         aspects.name = name;
 
+        // Store the aspects as a static member of the class
         widget._aspects = aspects;
         
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate

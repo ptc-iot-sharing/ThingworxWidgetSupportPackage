@@ -1,11 +1,25 @@
 
 /// <reference path="../../types/index.d.ts" />
 
+declare class TWEvent extends Function {
+    private _isThingworxEvent: true;
+}
+
+
+type Filter<B, T> = {
+    [Key in keyof B]:
+        B[Key] extends T ? Key: never;
+}
+
+type CompatibleKeys<B, T> = Filter<B, T>[keyof B];
+
+type ProtoOf<T> = Pick<T, keyof T>
+
 /**
  * A class that represents a property aspect.
  */
-declare class TWPropertyAspect<T> {
-    private static aspectWithKeyAndValue<T>(key: string, value: any): TWPropertyAspect<T>;
+declare class TWRuntimePropertyAspect {
+    private static aspectWithKeyAndValue(key: string, value: any): TWRuntimePropertyAspect;
 
     private _key: string;
 
@@ -24,11 +38,7 @@ declare class TWPropertyAspect<T> {
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
  */
-export function willBind<T extends TWRuntimeWidget>(name: keyof T): TWPropertyAspect<T>;
-
-declare interface TWDidBindMethod {
-    (previousValue: any, info: TWUpdatePropertyInfo): void;
-}
+export function canBind(name: string): TWRuntimePropertyAspect;
 
 /**
  * Constructs and returns a property aspect that can be used to 
@@ -45,14 +55,26 @@ declare interface TWDidBindMethod {
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
  */
-export function didBind<T extends TWRuntimeWidget, K extends keyof T>(name: T[K] extends TWDidBindMethod ? K : never): TWPropertyAspect<T>;
+export function didBind(name: string): TWRuntimePropertyAspect;
 
 /**
  * Returns a decorator that binds the class member it is applied to to a property definition.
- * @param  {...TWPropertyAspect} args       An optional list of property aspects to apply to this property.
+ * 
+ * @param {string} name                     If specified, this represents the name of the widget property to which this class member will be bound.
+ *                                          If omitted, the name of the class member will be used instead.
+ * 
+ * @param {...TWPropertyAspect} args        An optional list of property aspects to apply to this property.
+ * 
  * @return {any}                            A decorator.
  */
-export function property<T extends TWRuntimeWidget>(...args: TWPropertyAspect<T>[]): (target: T, key: any, descriptor?: any) => void;
+export function property(name: string, ...args: TWRuntimePropertyAspect[]): <T extends TWRuntimeWidget>(target: T, key: any, descriptor?: any) => void;
+
+/**
+ * Returns a decorator that binds the class member it is applied to to a property definition.
+ * @param  {...TWRuntimePropertyAspect} args        An optional list of property aspects to apply to this property.
+ * @return {any}                                    A decorator.
+ */
+export function property(...args: TWRuntimePropertyAspect[]): <T extends TWRuntimeWidget>(target: T, key: any, descriptor?: any) => void;
 
 /**
  * Binds the class member it is applied to to the a property.
@@ -61,33 +83,42 @@ export function property<T extends TWRuntimeWidget>(target: T, key: any, descrip
 
 
 /**
- * A decorator that binds the property it is applied to to the service with the given name.
+ * Returns a decorator that binds the property it is applied to to the service with the given name.
  * @param name      The name of the service to which this property will be bound.
+ * @return          A decorator.
  */
 export function service(name: string): (target: any, key: any, descriptor?: any) => void;
 
 /**
- * A decorator that binds the given property to a service.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * A decorator that binds the given property to the service with the same name as the method.
  */
 export function service(target: any, key: any, descriptor?: any): void;
 
 /**
- * A decorator that marks the given property as an event.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * Returns a decorator that binds the property it is applied to to the event with the given name.
+ * @param name      The name of the event to which this property will be bound.
+ * @return          A decorator.
  */
-export function event(target: any, key: any, descriptor?: any): void;
+export function event(name: string): <T extends TWRuntimeWidget, K extends keyof T, F extends T[K]>(target: T, key: CompatibleKeys<T, TWEvent>, descriptor?: TypedPropertyDescriptor<TWEvent>) => void;
 
 /**
-* Returns a decorator that makes a given widget class available to Thingworx.
-* @param {string} name                 The display name of the widget.
-* @param  {...TWWidgetAspect} args     An optional list of aspects to apply to the widget.
+ * A decorator that marks the given property as an event.
+ */
+export function event<T extends TWRuntimeWidget, K extends keyof T, F extends T[K]>(target: T, key: CompatibleKeys<T, TWEvent>, descriptor?: TypedPropertyDescriptor<TWEvent>): void;
+
+/**
+ * Returns a decorator that makes a given widget class available to Thingworx.
+ * @param name              The name of the widget.
+ * @param args              An optional list of aspects to apply to the widget.
+ * @return                  A decorator.
+ */
+export function TWWidgetDefinition<T extends new(...args: {}[]) => TWRuntimeWidget>(name: string): <T extends new(...args: {}[]) => TWRuntimeWidget>(widget: T) => void;
+
+/**
+* A decorator that makes a given widget class available to Thingworx.
+* @param widget     The widget the decorator is applied to.
 */
-export function TWWidgetDefinition<T extends TWRuntimeWidget>(widget: T): void;
+export function TWWidgetDefinition<T extends new(...args: {}[]) => TWRuntimeWidget>(widget: T): void;
 
 /**
  * Returns a decorator that binds the class member it is applied to to the given widget property.
