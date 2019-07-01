@@ -1,3 +1,5 @@
+;
+
 /**
  * A class that represents a property aspect.
  */

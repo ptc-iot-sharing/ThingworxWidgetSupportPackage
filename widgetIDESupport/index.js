@@ -1,3 +1,4 @@
+;
 
 /**
  * A class that represents a property aspect.
@@ -98,7 +99,7 @@ export function defaultValue(value) {
  * @return {TWPropertyAspect}   A property aspect.
  */
 export function willSet(name) {
-    return TWPropertyAspect.aspectWithKeyAndValue('_willSet', value);
+    return TWPropertyAspect.aspectWithKeyAndValue('_willSet', name);
 }
 
 /**
@@ -114,7 +115,7 @@ export function willSet(name) {
  * @return {TWPropertyAspect}   A property aspect.
  */
 export function didSet(name) {
-    return TWPropertyAspect.aspectWithKeyAndValue('_didSet', value);
+    return TWPropertyAspect.aspectWithKeyAndValue('_didSet', name);
 }
 
 /**
@@ -129,7 +130,7 @@ export function didSet(name) {
  * @return {TWPropertyAspect}   A property aspect.
  */
 export function didBind(name) {
-    return TWPropertyAspect.aspectWithKeyAndValue('_didBind', value);
+    return TWPropertyAspect.aspectWithKeyAndValue('_didBind', name);
 }
 
 const willSetSymbol = window.Symbol ? window.Symbol() : '@@_willSet';
