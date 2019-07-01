@@ -647,7 +647,7 @@ export function TWWidgetDefinition(name, ...args) {
         _getDecoratedDidBind(widget.prototype);
 
         // Copy over the decorations from the superclass
-        const superclass = Object.getPrototypeOf(this).constructor;
+        const superclass = Object.getPrototypeOf(widget.prototype).constructor;
 
         let aspects = {};
 
