@@ -22,7 +22,7 @@ class TWRuntimePropertyAspect {
  * @param {string} name         The name of the method that will handle this.
  * @return {TWRuntimePropertyAspect}   A property aspect.
  */
-export function willBind(name) {
+export function canBind(name) {
     return TWRuntimePropertyAspect.aspectWithKeyAndValue('_willBind', name);
 }
 
