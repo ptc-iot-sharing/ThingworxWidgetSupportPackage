@@ -1,5 +1,3 @@
-;
-
 /**
  * A class that represents a property aspect.
  */
@@ -64,6 +62,7 @@ const willBindSymbol = window.Symbol ? window.Symbol() : '@@_willBind';
 const didBindSymbol = window.Symbol ? window.Symbol() : '@@_didBind';
 const decoratedPropertiesSymbol = window.Symbol ? window.Symbol() : '@@_decoratedProperties';
 const decoratedServicesSymbol = window.Symbol ? window.Symbol() : '@@_decoratedServices';
+const versionSymbol = window.Symbol ? window.Symbol() : '@@_version';
 
 const _getInheritedProperty = function (proto, property) {
     if (proto[property]) return proto[property];
@@ -365,7 +364,7 @@ if (typeof TW.Widget == 'function') {
         if (window.TWRuntimeWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if (!TWRuntimeWidget.prototype.updateProperty) {
+            if ((!TWRuntimeWidget.prototype[versionSymbol]) || TWRuntimeWidget.prototype[versionSymbol] < 2) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     updateProperty(info) {
@@ -400,6 +399,8 @@ if (typeof TW.Widget == 'function') {
                 };
                 TWRuntimeWidget.prototype.updateProperty = prototype.updateProperty;
                 TWRuntimeWidget.prototype.serviceInvoked = prototype.serviceInvoked;
+                TWRuntimeWidget.prototype[versionSymbol] = 2;
+
             }
             return;
         }
@@ -480,7 +481,9 @@ if (typeof TW.Widget == 'function') {
                 if (name in decoratedServices) {
                     this[decoratedServices[name]]();
                 }
-            }
+            },
+
+            [versionSymbol]: 2
         };
     })();
 }

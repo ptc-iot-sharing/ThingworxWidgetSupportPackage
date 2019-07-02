@@ -1,5 +1,3 @@
-;
-
 /**
  * A class that represents a property aspect.
  */
@@ -136,6 +134,7 @@ export function didBind(name) {
 const willSetSymbol = window.Symbol ? window.Symbol() : '@@_willSet';
 const didSetSymbol = window.Symbol ? window.Symbol() : '@@_didSet';
 const didBindSymbol = window.Symbol ? window.Symbol() : '@@_didBind';
+const versionSymbol = window.Symbol ? window.Symbol() : '@@_version';
 
 const _getInheritedProperty = function (proto, property) {
     if (proto[property]) return proto[property];
@@ -383,7 +382,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
         if (window.TWComposerWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if (!TWComposerWidget.prototype.widgetProperties) {
+            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < 2) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
@@ -435,20 +434,20 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     },
 
                     beforeSetProperty(key, value) {
-                        if (this.constructor[willSetSymbol] && (key in this.constructor[willSetSymbol])) {
-                            return this[this.constructor[willSetSymbol][key]](value);
+                        if (this[willSetSymbol] && (key in this[willSetSymbol])) {
+                            return this[this[willSetSymbol][key]](value);
                         }
                     },
 
                     afterSetProperty(key, value) {
-                        if (this.constructor[didSetSymbol] && (key in this.constructor[didSetSymbol])) {
-                            return this[this.constructor[didSetSymbol][key]](value);
+                        if (this[didSetSymbol] && (key in this[didSetSymbol])) {
+                            return this[this[didSetSymbol][key]](value);
                         }
                     },
 
                     afterAddBindingSource(info) {
-                        if (this.constructor[didbindSymbol] && (info.targetProperty in this.constructor[didbindSymbol])) {
-                            return this[this.constructor[didbindSymbol][info.targetProperty]](info);
+                        if (this[didBindSymbol] && (info.targetProperty in this[didBindSymbol])) {
+                            return this[this[didBindSymbol][info.targetProperty]](info);
                         }
                     }
                 };
@@ -458,6 +457,10 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
+                TWComposerWidget.prototype[versionSymbol] = 2;
+
+                // Make the prototype read-only; future releases will be able to handle this
+                Object.defineProperty(window.TWComposerWidget, 'prototype', {writable: false});
             }
             return;
         }
@@ -601,23 +604,29 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             },
 
             beforeSetProperty(key, value) {
-                if (this.constructor[willSetSymbol] && (key in this.constructor[willSetSymbol])) {
-                    return this[this.constructor[willSetSymbol][key]](value);
+                if (this[willSetSymbol] && (key in this[willSetSymbol])) {
+                    return this[this[willSetSymbol][key]](value);
                 }
             },
 
             afterSetProperty(key, value) {
-                if (this.constructor[didSetSymbol] && (key in this.constructor[didSetSymbol])) {
-                    return this[this.constructor[didSetSymbol][key]](value);
+                if (this[didSetSymbol] && (key in this[didSetSymbol])) {
+                    return this[this[didSetSymbol][key]](value);
                 }
             },
 
             afterAddBindingSource(info) {
-                if (this.constructor[didbindSymbol] && (info.targetProperty in this.constructor[didbindSymbol])) {
-                    return this[this.constructor[didbindSymbol][info.targetProperty]](info);
+                if (this[didBindSymbol] && (info.targetProperty in this[didBindSymbol])) {
+                    return this[this[didBindSymbol][info.targetProperty]](info);
                 }
-            }
+            },
+
+            [versionSymbol]: 2
         };
+
+        // Make the prototype read-only; future releases will be able to handle this
+        Object.defineProperty(window.TWComposerWidget, 'prototype', {writable: false});
+
     })();
 
 }
