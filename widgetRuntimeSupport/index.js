@@ -179,6 +179,7 @@ export function property(...args) {
         return decorator;
     }
     else {
+        name = args[1];
         decorator.apply(this, arguments);
     }
 }
