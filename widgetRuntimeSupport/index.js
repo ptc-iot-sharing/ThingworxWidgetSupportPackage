@@ -130,11 +130,11 @@ export function property(...args) {
                 const aspect = args[i];
                 switch (aspect._key) {
                     case '_willBind':
-                        const decoratedWillBind = _getDecoratedWillBind(this);
+                        const decoratedWillBind = _getDecoratedWillBind(target);
                         decoratedWillBind[name] = aspect._value;
                         break;
                     case '_didBind':
-                        const decoratedDidBind = _getDecoratedDidBind(this);
+                        const decoratedDidBind = _getDecoratedDidBind(target);
                         decoratedDidBind[name] = aspect._value;
                         break;
                 }
