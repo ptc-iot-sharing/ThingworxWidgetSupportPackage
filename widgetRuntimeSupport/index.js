@@ -243,15 +243,19 @@ export function service(arg1) {
  */
 export function event(arg1) {
     let name = arg1;
-    const decorator = function (target, key, descriptor) {
+    const decorator = function (target, key, /** @type {TypedPropertyDescriptor} */descriptor) {
         const event = function () {
             this.jqElement.triggerHandler(name);
         }
-        // Decorate updateProperty if a previous annotation hasn't already done it
-        return {
-            get() {
+
+        if (descriptor) {
+            descriptor.get = function () {
                 return event;
             }
+            descriptor.writable = false;
+        }
+        else {
+            Object.defineProperty(target, key, {get() {return event;}})
         }
     }
 
