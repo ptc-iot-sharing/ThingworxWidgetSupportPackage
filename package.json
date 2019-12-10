@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage.git"
+    "url": "git+https://github.com/ptc-iot-sharing/ThingworxWidgetSupportPackage.git"
   },
   "keywords": [
     "thingworx",
@@ -20,7 +20,7 @@
   "author": "Petrisor Lacatus",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage/issues"
+    "url": "https://github.com/ptc-iot-sharing/ThingworxWidgetSupportPackage/issues"
   },
-  "homepage": "https://github.com/stefan-lacatus/ThingworxWidgetSupportPackage#readme"
+  "homepage": "https://github.com/ptc-iot-sharing/ThingworxWidgetSupportPackage"
 }
