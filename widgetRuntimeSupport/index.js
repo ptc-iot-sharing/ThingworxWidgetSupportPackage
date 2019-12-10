@@ -57,12 +57,18 @@ export function name(name) {
     return TWRuntimePropertyAspect.aspectWithKeyAndValue('name', name);
 }
 
+function getSymbol(symbolDesc) {
+    if (!window.TW[symbolDesc]) {
+        window.TW[symbolDesc] = window.Symbol ? window.Symbol(symbolDesc) : symbolDesc;
+    }
+    return window.TW[symbolDesc];
+}
 
-const willBindSymbol = window.Symbol ? window.Symbol() : '@@_willBind';
-const didBindSymbol = window.Symbol ? window.Symbol() : '@@_didBind';
-const decoratedPropertiesSymbol = window.Symbol ? window.Symbol() : '@@_decoratedProperties';
-const decoratedServicesSymbol = window.Symbol ? window.Symbol() : '@@_decoratedServices';
-const versionSymbol = window.Symbol ? window.Symbol() : '@@_version';
+const willBindSymbol = getSymbol('@@_willBind');
+const didBindSymbol = getSymbol('@@_didBind');
+const decoratedPropertiesSymbol = getSymbol('@@_decoratedProperties');
+const decoratedServicesSymbol = getSymbol('@@_decoratedServices');
+const versionSymbol = getSymbol('@@_version');
 
 const _getInheritedProperty = function (proto, property) {
     if (proto[property]) return proto[property];
@@ -93,10 +99,13 @@ export function property(...args) {
     let name;
     let aspectsIndex;
 
-    const decorator = function (target, key, descriptor) {
+    const decorator = (target, key, descriptor) => {
         var setter;
         var hasDescriptor = (descriptor !== undefined);
         if (!hasDescriptor) descriptor = {};
+        if(!name) {
+            name = key;
+        }
 
         // Override the setter to call setProperty. It should also invoke the member's setter if it has one
         if (descriptor.set) {
@@ -193,7 +202,7 @@ export function property(...args) {
  */
 export function service(arg1) {
     let name = arg1;
-    const decorator = function (target, key, descriptor) {
+    const decorator = (target, key, descriptor) => {
 
         // Decorate updateProperty if a previous annotation hasn't already done it
         const decoratedServices = _getDecoratedServices(target);
@@ -243,7 +252,7 @@ export function service(arg1) {
  */
 export function event(arg1) {
     let name = arg1;
-    const decorator = function (target, key, /** @type {TypedPropertyDescriptor} */descriptor) {
+    const decorator = (target, key, /** @type {TypedPropertyDescriptor} */descriptor) => {
         const event = function () {
             this.jqElement.triggerHandler(name);
         }

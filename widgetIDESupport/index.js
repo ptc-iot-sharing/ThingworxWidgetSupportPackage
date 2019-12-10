@@ -131,10 +131,17 @@ export function didBind(name) {
     return TWPropertyAspect.aspectWithKeyAndValue('_didBind', name);
 }
 
-const willSetSymbol = window.Symbol ? window.Symbol() : '@@_willSet';
-const didSetSymbol = window.Symbol ? window.Symbol() : '@@_didSet';
-const didBindSymbol = window.Symbol ? window.Symbol() : '@@_didBind';
-const versionSymbol = window.Symbol ? window.Symbol() : '@@_version';
+function getSymbol(symbolDesc) {
+    if (!TW[symbolDesc]) {
+        TW[symbolDesc] = window.Symbol ? window.Symbol(symbolDesc) : symbolDesc;
+    }
+    return TW[symbolDesc];
+}
+
+const willSetSymbol = getSymbol('@@_willSet');
+const didSetSymbol = getSymbol('@@_didSet');
+const didBindSymbol = getSymbol('@@_didBind');
+const versionSymbol = getSymbol('@@_version');
 
 const _getInheritedProperty = function (proto, property) {
     if (proto[property]) return proto[property];
@@ -393,7 +400,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                             for (let aspect in this.constructor._aspects) {
                                 result[aspect] = this.constructor._aspects[aspect];
                             }
-        
+
                             // this._decoratedProperties contains properties, events and
                             // services together, so it has to be filtered to only return the properties
                             result.properties = {};
@@ -404,11 +411,11 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                                     }
                                 }
                             }
-                            
+
                             return result;
                         }
                     },
-        
+
                     widgetServices() {
                         var result = {};
                         if (this._decoratedProperties) {
@@ -420,7 +427,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         }
                         return result;
                     },
-        
+
                     widgetEvents() {
                         var result = {};
                         if (this._decoratedProperties) {
@@ -460,7 +467,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype[versionSymbol] = 2;
 
                 // Make the prototype read-only; future releases will be able to handle this
-                Object.defineProperty(window.TWComposerWidget, 'prototype', {writable: false});
+                Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
             }
             return;
         }
@@ -574,7 +581,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                             }
                         }
                     }
-                    
+
                     return result;
                 }
             },
@@ -625,7 +632,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
         };
 
         // Make the prototype read-only; future releases will be able to handle this
-        Object.defineProperty(window.TWComposerWidget, 'prototype', {writable: false});
+        Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
 
     })();
 
@@ -643,11 +650,11 @@ export function TWWidgetDefinition(name, ...args) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        
+
         // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
         // functions now run in strict mode and crash when attempting to write to the read-only prototype
         // property
-        Object.defineProperty(widget, 'prototype', {writable: false});
+        Object.defineProperty(widget, 'prototype', { writable: false });
 
         // Ensure that decorated properties are copied over correctly
         _getDecoratedProperties(widget.prototype);
@@ -673,7 +680,7 @@ export function TWWidgetDefinition(name, ...args) {
 
         // Store the aspects as a static member of the class
         widget._aspects = aspects;
-        
+
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
         TW.IDE.Widgets[widget.name] = function () {
@@ -691,12 +698,12 @@ export function ThingworxComposerWidget(widget) {
     // Thingworx attempts to change the prototype of the custom widget constructor
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
-    
+
     // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
     // functions now run in strict mode and crash when attempting to write to the read-only prototype
     // property
-    Object.defineProperty(widget, 'prototype', {writable: false});
-    
+    Object.defineProperty(widget, 'prototype', { writable: false });
+
     // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
     // instance when invoked
     TW.IDE.Widgets[widget.name] = function () {
@@ -718,7 +725,7 @@ export function TWNamedComposerWidget(name) {
         // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
         // functions now run in strict mode and crash when attempting to write to the read-only prototype
         // property
-        Object.defineProperty(widget, 'prototype', {writable: false});
+        Object.defineProperty(widget, 'prototype', { writable: false });
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
