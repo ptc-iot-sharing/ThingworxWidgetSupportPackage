@@ -82,7 +82,7 @@ export function defaultValue(value): TWPropertyAspect;
 /**
  * Constructs and returns a property aspect that sets the available selection options for the property.
  * This will make it a dropdown selection field.
- * @param {array} optionsArray      optionsArray
+ * @param {TWPropertySelectOption[]} optionsArray
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function selectOptions(optionsArray): TWPropertyAspect;

@@ -94,7 +94,7 @@ export function defaultValue(value) {
  *  {text: 'Day', value: 'timeGridDay'},
  *  {text: 'List', value: 'dayGridWeek'},
  * ]
- * @param {array} optionsArray      optionsArray
+ * @param {TWPropertySelectOption[]} optionsArray      optionsArray
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function selectOptions(optionsArray) {
