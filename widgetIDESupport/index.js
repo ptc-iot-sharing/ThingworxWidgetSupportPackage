@@ -98,7 +98,7 @@ export function defaultValue(value) {
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function selectOptions(optionsArray) {
-    TWPropertyAspect.aspectWithKeyAndValue('selectOptions', optionsArray);
+    return TWPropertyAspect.aspectWithKeyAndValue('selectOptions', optionsArray);
 }
 
 
