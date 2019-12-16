@@ -57,7 +57,7 @@ export function sourcePropertyName(name: string): TWSourceInfotablePropertyAspec
 
 /**
  * Constructs and returns a property aspect that specifies what infotable
- * property this rendering is based upon when the baseType is set to `'RENDERERWITHFORMAT'`. 
+ * property this rendering is based upon when the baseType is set to `'RENDERERWITHFORMAT'`.
  * This must be the name of one of this widget's infotable properties.
  * @param {string} name         The name of the infotable property.
  * @return {TWPropertyAspect}   A property aspect.
@@ -80,13 +80,21 @@ export function baseTypeRestriction(name): TWPropertyAspect;
 export function defaultValue(value): TWPropertyAspect;
 
 /**
+ * Constructs and returns a property aspect that sets the available selection options for the property.
+ * This will make it a dropdown selection field.
+ * @param {array} optionsArray      optionsArray
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function selectOptions(optionsArray): TWPropertyAspect;
+
+/**
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, but before it is actually updated.
  * The method can be used to validate the new property value.
- * 
+ *
  * This must be the name of a method on the widget class that receives the following parameters:
  * - **`value`**:     Represents the value that is about to be assigned to the property.
- * 
+ *
  * The method can return a `string` if the update should fail. The string returned by that method
  * will be used as an error message displayed to the user that explains why the new value was rejected.
  * @param {string} name         The name of the method that will handle this.
@@ -98,10 +106,10 @@ export function willSet(name: string): TWPropertyAspect;
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, after its value has been updated.
  * The method can be used to react to the updated property or instruct Thingworx to redraw the widget.
- * 
+ *
  * This must be the name of a method on the widget class that receives the following parameters:
  * - **`value`**:     Represents the value that has been assigned to the property.
- * 
+ *
  * The method can return a `boolean` that tells Thingworx whether the widget should be redrawn because of the update.
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
@@ -112,10 +120,10 @@ export function didSet(name: string): TWPropertyAspect;
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user adds a binding source to this property.
  * The method can be used to react to the new binding.
- * 
+ *
  * This must be the name of a method on the widget class that receives the following parameters:
  * - **`bindingInfo`**:     An object containing information about the newly created binding.
- * 
+ *
  * The method can return a `boolean` that tells Thingworx whether the widget should be redrawn because of the update.
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
@@ -123,7 +131,7 @@ export function didSet(name: string): TWPropertyAspect;
 export function didBind(name: string): TWPropertyAspect;
 
 /**
- * Returns a decorator that marks the given property as a property definition. 
+ * Returns a decorator that marks the given property as a property definition.
  * Getting or setting the affected property will then be routed through `getProperty` and `setProperty`.
  * @param {string} baseType     The property's base type.
  * @param  {...TWPropertyAspect} args        An optional list of property aspects to apply to this property.
@@ -132,7 +140,7 @@ export function didBind(name: string): TWPropertyAspect;
 export function property(baseType: TWBaseType, ...args: TWPropertyAspect[]): (target: any, key: any, descriptor?: any) => void;
 
 /**
- * Returns a decorator that marks the given property as a property definition. 
+ * Returns a decorator that marks the given property as a property definition.
  * Getting or setting the affected property will then be routed through `getProperty` and `setProperty`.
  * @param {string} baseType     The property's base type.
  * @param  {...TWPropertyAspect} args        An optional list of property aspects to apply to this property.
@@ -142,17 +150,17 @@ export function property(baseType: 'FIELDNAME', sourceProperty: TWSourceInfotabl
 
 /**
  * A decorator that marks the given property as a service.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * @param {} target
+ * @param {*} key
+ * @param {*} descriptor
  */
 export function service(target: any, key: any, descriptor?: any): void;
 
 /**
  * A decorator that marks the given property as an event.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * @param {} target
+ * @param {*} key
+ * @param {*} descriptor
  */
 export function event(target: any, key: any, descriptor?: any): void;
 
@@ -226,10 +234,10 @@ export const supportsLabel: TWWidgetAspect;
 
 /**
  * Constructs and returns a widget aspect that sets the border width of the widget.
- * If the widget provides a border, this should be set to the width of the border. 
- * This helps ensure pixel-perfect WYSIWG between builder and runtime. 
- * If you set a border of 1px on the “widget-content” element at design time, you are effectively making that widget 2px taller and 2px wider (1px to each side). 
- * To account for this descrepancy, setting the borderWidth property will make the design-time widget the exact same number of pixels smaller. 
+ * If the widget provides a border, this should be set to the width of the border.
+ * This helps ensure pixel-perfect WYSIWG between builder and runtime.
+ * If you set a border of 1px on the “widget-content” element at design time, you are effectively making that widget 2px taller and 2px wider (1px to each side).
+ * To account for this descrepancy, setting the borderWidth property will make the design-time widget the exact same number of pixels smaller.
  * Effectively, this places the border “inside” the widget that you have created and making the width & height in the widget properties accurate.
  * @param {any} value               The border width value.
  * @return {TWWidgetAspect}       A property aspect.
@@ -256,7 +264,7 @@ export function TWWidgetDefinition(name: string, ...args: TWWidgetAspect[]): (wi
 
 /**
  * @deprecated Use TWWidgetDefinition
- * 
+ *
  * Makes the given widget class available to Thingworx.
  * @param widget        The widget class to export.
  */
@@ -264,7 +272,7 @@ export function ThingworxComposerWidget(widget: any): void;
 
 /**
  * @deprecated Use TWWidgetDefinition
- * 
+ *
  * Makes the given widget class available to Thingworx.
  * @param name          The name with which the widget will be exported.
  */

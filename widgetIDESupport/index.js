@@ -54,7 +54,7 @@ export function sourcePropertyName(name) {
 
 /**
  * Constructs and returns a property aspect that specifies what infotable
- * property this rendering is based upon when the baseType is set to `'RENDERERWITHFORMAT'`. 
+ * property this rendering is based upon when the baseType is set to `'RENDERERWITHFORMAT'`.
  * This must be the name of one of this widget's infotable properties.
  * @param {string} name         The name of the infotable property.
  * @return {TWPropertyAspect}   A property aspect.
@@ -82,15 +82,34 @@ export function defaultValue(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('defaultValue', value);
 }
 
+/**
+ * Constructs and returns a property aspect that sets the available selection options for the property.
+ * This will make it a dropdown selection field.
+ * In this case the default value has to be the value of one of the options.
+ * example:
+ * optionsArray = [
+ *  {text: 'Select', value: 'dayGridMonth,timeGridWeek,timeGridDay,dayGridWeek'},
+ *  {text: 'Month', value: 'dayGridMonth'},
+ *  {text: 'Week', value: 'timeGridWeek'},
+ *  {text: 'Day', value: 'timeGridDay'},
+ *  {text: 'List', value: 'dayGridWeek'},
+ * ]
+ * @param {array} optionsArray      optionsArray
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function selectOptions(optionsArray) {
+    TWPropertyAspect.aspectWithKeyAndValue('selectOptions', optionsArray);
+}
+
 
 /**
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, but before it is actually updated.
  * The method can be used to validate the new property value.
- * 
+ *
  * This must be the name of a method on the widget class that receives the following parameters:
  * - **`value`**:     Represents the value that is about to be assigned to the property.
- * 
+ *
  * The method can return a `string` if the update should fail. The string returned by that method
  * will be used as an error message displayed to the user that explains why the new value was rejected.
  * @param {string} name         The name of the method that will handle this.
@@ -104,10 +123,10 @@ export function willSet(name) {
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, after its value has been updated.
  * The method can be used to react to the updated property or instruct Thingworx to redraw the widget.
- * 
+ *
  * This must be the name of a method on the widget class that receives the following parameters:
  * - **`value`**:     Represents the value that has been assigned to the property.
- * 
+ *
  * The method can return a `boolean` that tells Thingworx whether the widget should be redrawn because of the update.
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
@@ -120,9 +139,9 @@ export function didSet(name) {
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user adds a binding source to this property.
  * The method can be used to react to the new binding.
- * 
+ *
  * This must be the name of a method on the widget class that will receive no parameters.
- * 
+ *
  * The method is not expected to return any value.
  * @param {string} name         The name of the method that will handle this.
  * @return {TWPropertyAspect}   A property aspect.
@@ -155,7 +174,7 @@ const _getDecoratedDidSet = proto => _getInheritedProperty(proto, didSetSymbol);
 const _getDecoratedDidBind = proto => _getInheritedProperty(proto, didBindSymbol);
 
 /**
- * Returns a decorator that marks the given property as a property definition. 
+ * Returns a decorator that marks the given property as a property definition.
  * Getting or setting the affected property will then be routed through `getProperty` and `setProperty`.
  * @param {string} baseType     The property's base type.
  * @param  {...TWPropertyAspect} args        An optional list of property aspects to apply to this property.
@@ -228,9 +247,9 @@ export function property(baseType, ...args) {
 
 /**
  * A decorator that marks the given property as a service.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * @param {} target
+ * @param {*} key
+ * @param {*} descriptor
  */
 export function service(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
@@ -246,9 +265,9 @@ export function service(target, key, descriptor) {
 
 /**
  * A decorator that marks the given property as an event.
- * @param {} target 
- * @param {*} key 
- * @param {*} descriptor 
+ * @param {} target
+ * @param {*} key
+ * @param {*} descriptor
  */
 export function event(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
@@ -348,10 +367,10 @@ export const supportsLabel = TWWidgetAspect.aspectWithKeyAndValue('supportsLabel
 
 /**
  * Constructs and returns a widget aspect that sets the border width of the widget.
- * If the widget provides a border, this should be set to the width of the border. 
- * This helps ensure pixel-perfect WYSIWG between builder and runtime. 
- * If you set a border of 1px on the “widget-content” element at design time, you are effectively making that widget 2px taller and 2px wider (1px to each side). 
- * To account for this descrepancy, setting the borderWidth property will make the design-time widget the exact same number of pixels smaller. 
+ * If the widget provides a border, this should be set to the width of the border.
+ * This helps ensure pixel-perfect WYSIWG between builder and runtime.
+ * If you set a border of 1px on the “widget-content” element at design time, you are effectively making that widget 2px taller and 2px wider (1px to each side).
+ * To account for this descrepancy, setting the borderWidth property will make the design-time widget the exact same number of pixels smaller.
  * Effectively, this places the border “inside” the widget that you have created and making the width & height in the widget properties accurate.
  * @param {any} value               The border width value.
  * @return {TWPropertyAspect}       A property aspect.
@@ -393,7 +412,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                             for (let aspect in this.constructor._aspects) {
                                 result[aspect] = this.constructor._aspects[aspect];
                             }
-        
+
                             // this._decoratedProperties contains properties, events and
                             // services together, so it has to be filtered to only return the properties
                             result.properties = {};
@@ -404,11 +423,11 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                                     }
                                 }
                             }
-                            
+
                             return result;
                         }
                     },
-        
+
                     widgetServices() {
                         var result = {};
                         if (this._decoratedProperties) {
@@ -420,7 +439,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         }
                         return result;
                     },
-        
+
                     widgetEvents() {
                         var result = {};
                         if (this._decoratedProperties) {
@@ -574,7 +593,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                             }
                         }
                     }
-                    
+
                     return result;
                 }
             },
@@ -643,7 +662,7 @@ export function TWWidgetDefinition(name, ...args) {
         // Thingworx attempts to change the prototype of the custom widget constructor
         // which in addition to being a bad practice, prevents the usual prototype-based inheritance
         // and prevents using the class-based syntax
-        
+
         // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
         // functions now run in strict mode and crash when attempting to write to the read-only prototype
         // property
@@ -673,7 +692,7 @@ export function TWWidgetDefinition(name, ...args) {
 
         // Store the aspects as a static member of the class
         widget._aspects = aspects;
-        
+
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
         TW.IDE.Widgets[widget.name] = function () {
@@ -691,12 +710,12 @@ export function ThingworxComposerWidget(widget) {
     // Thingworx attempts to change the prototype of the custom widget constructor
     // which in addition to being a bad practice, prevents the usual prototype-based inheritance
     // and prevents using the class-based syntax
-    
+
     // As of Thingworx 8.4 making the prototype read-only is no longer viable as the widget factory
     // functions now run in strict mode and crash when attempting to write to the read-only prototype
     // property
     Object.defineProperty(widget, 'prototype', {writable: false});
-    
+
     // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
     // instance when invoked
     TW.IDE.Widgets[widget.name] = function () {
