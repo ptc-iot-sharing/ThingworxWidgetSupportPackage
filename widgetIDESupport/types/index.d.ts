@@ -12,6 +12,14 @@ declare class TWPropertyAspect {
     private _value: any;
 }
 
+/**
+ * A possible option to select as the value of a property
+ */
+declare interface TWPropertySelectOptions {
+    text: string;
+    value: string;
+}
+
 declare class TWSourceInfotablePropertyAspect extends TWPropertyAspect {
 }
 
@@ -78,6 +86,13 @@ export function baseTypeRestriction(name): TWPropertyAspect;
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function defaultValue(value): TWPropertyAspect;
+
+/**
+ * Constructs and returns a property aspect that sets the list of available options for a property.
+ * @param {TWPropertySelectOptions} value An array of objects with text and value properties
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function selectOptions(value: TWPropertySelectOptions): TWPropertyAspect;
 
 /**
  * Constructs and returns a property aspect that represents the name of a method that will be

@@ -82,6 +82,14 @@ export function defaultValue(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('defaultValue', value);
 }
 
+/**
+ * Constructs and returns a property aspect that sets the list of available options for a property.
+ * @param {TWPropertySelectOptions} value An array of objects with text and value properties
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function selectOptions(value) {
+    return TWPropertyAspect.aspectWithKeyAndValue('selectOptions', value);
+}
 
 /**
  * Constructs and returns a property aspect that represents the name of a method that will be
