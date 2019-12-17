@@ -89,7 +89,7 @@ export function defaultValue(value): TWPropertyAspect;
 
 /**
  * Constructs and returns a property aspect that sets the list of available options for a property.
- * @param {TWPropertySelectOptions} value An array of objects with text and value properties
+ * @param {TWPropertySelectOptions[]} value An array of objects with text and value properties
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function selectOptions(value: TWPropertySelectOptions): TWPropertyAspect;
