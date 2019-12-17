@@ -92,7 +92,7 @@ export function defaultValue(value): TWPropertyAspect;
  * @param {TWPropertySelectOptions[]} value An array of objects with text and value properties
  * @return {TWPropertyAspect}       A property aspect.
  */
-export function selectOptions(value: TWPropertySelectOptions): TWPropertyAspect;
+export function selectOptions(value: TWPropertySelectOptions[]): TWPropertyAspect;
 
 /**
  * Constructs and returns a property aspect that represents the name of a method that will be
