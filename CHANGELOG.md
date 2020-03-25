@@ -1,3 +1,9 @@
+## 2.0.3 (2020-03-25)
+
+### Bug Fixes
+
+* Fixed widgets that inherit from a base widget sharing properties: https://github.com/ptc-iot-sharing/ThingworxWidgetSupportPackage/commit/c546e8a4914c126612140075c8822a846092980a
+
 ## 2.0.3 (2019-12-17)
 
 ### Bug Fixes
