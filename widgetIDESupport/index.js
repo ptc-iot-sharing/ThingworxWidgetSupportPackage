@@ -152,7 +152,7 @@ const didBindSymbol = getSymbol('@@_didBind');
 const versionSymbol = getSymbol('@@_version');
 
 const _getInheritedProperty = function (proto, property) {
-    if (proto[property]) return proto[property];
+    if (proto.hasOwnProperty(property)) return proto[property];
 
     const superproto = Object.getPrototypeOf(proto);
 
@@ -204,7 +204,7 @@ export function property(baseType, ...args) {
         }
 
         // Create the _decoratedProperties property if a previous annotation hasn't already done it
-        if (!target._decoratedProperties) {
+        if (!target.hasOwnProperty('_decoratedProperties')) {
             target._decoratedProperties = _getDecoratedProperties(target);
         }
 
@@ -249,7 +249,7 @@ export function property(baseType, ...args) {
  */
 export function service(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
-    if (!target._decoratedProperties) {
+    if (!target.hasOwnProperty('_decoratedProperties')) {
         target._decoratedProperties = _getDecoratedProperties(target);
     }
 
@@ -267,7 +267,7 @@ export function service(target, key, descriptor) {
  */
 export function event(target, key, descriptor) {
     // Create the _decoratedProperties property if a previous annotation hasn't already done it
-    if (!target._decoratedProperties) {
+    if (!target.hasOwnProperty('_decoratedProperties')) {
         target._decoratedProperties = _getDecoratedProperties(target);
     }
 
