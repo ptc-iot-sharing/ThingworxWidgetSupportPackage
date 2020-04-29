@@ -609,6 +609,24 @@ declare abstract class TWComposerWidget extends TWWidget {
     hide(): void;
 
     /**
+     * Used by Thingworx to select the current widget.
+     * Can be used as a trigger for when the widget is selected
+     *
+     * Subclasses are expected to not override this method.
+     * If this method is overriden, it must call the super method
+     */
+    selectWidget(): void;
+
+    /**
+     * Used by Thingworx to unselect the current widget.
+     * Can be used as a trigger for when the widget is deselected
+     *
+     * Subclasses are expected to not override this method.
+     * If this method is overriden, it must call the super method
+     */
+    unselectWidget(clearSelection?: boolean): void;
+
+    /**
      * Validates the bindings done to the widgets and reports errors in the ToDos list
      * The `severity` can be one of: info, warning, error
      * The message can contain the string `{target-id}` which will be replaced with the widget display name
