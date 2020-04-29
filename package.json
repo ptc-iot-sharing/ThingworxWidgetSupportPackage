@@ -1,6 +1,6 @@
 {
   "name": "typescriptwebpacksupport",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Helper functions to allow usage of typescript and webpack with thingworx widgets. Also includes typings for Thingworx",
   "main": "widgetRuntimeSupport.js",
   "module": "widgetRuntimeSupport.js",
