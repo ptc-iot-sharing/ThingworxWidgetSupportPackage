@@ -1,3 +1,12 @@
+## 2.0.6 (2020-07-01)
+
+* Added missing `@responsiveWidgetContainer` and `@nonRemovable` composer widget annotations
+* Expose method `TWWidgetAspect.aspectWithKeyAndValue` as public, since it will enable users to use methods that are not fully defined
+* Added missing `addWidget`, `widgetContextMenuCmd`  and `widgetContextMenuItems` on composer widgets
+
+## 2.0.5 (2020-04-29)
+
+* Added missing `select` and `unselect` methods on composer widgets (4b6feb2962667e6d9e2d3cc36af5a553ba2a031c)
 ## 2.0.4 (2020-03-25)
 
 ### Bug Fixes

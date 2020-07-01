@@ -210,6 +210,15 @@ export const draggable: TWWidgetAspect;
 export const container: TWWidgetAspect;
 
 /**
+ * Makes this widget a container that can only hold one responsive widget
+ */
+export const responsiveWidgetContainer: TWWidgetAspect;
+/**
+ * Makes this widget non removable
+ */
+export const nonRemovable: TWWidgetAspect;
+
+/**
  * Makes this widget a container that can hold other widgets in specific places.
  * This widget is expected to have elements representing dedicated spots for sub-widgets in its runtime and design-time DOM structures.
  * Its subwidgets will be added in order to its declarative spots.
