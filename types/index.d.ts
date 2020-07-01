@@ -1,4 +1,4 @@
-declare interface JQuery<T = HTMLElement> {}
+declare interface JQuery<T = HTMLElement> { }
 
 /**
  * An interface representing an object whose key values are constrained to a generic type.
@@ -424,11 +424,11 @@ declare interface TWWidgetProperties {
 
     /**
      * An array of developer-defined custom properties for the widget.
-     * The developer can also redefine certain generic properties such as `Width` or `Height` to customize their behaviour
+     * The developer can also redefine certain generic properties such as `Width` or `Height` to customize their behavior
      * by including them in this array. For these properties, it is not required to specify all of their attributes, but rather only the ones
      * that should be different from the default.
      */
-    properties: Dictionary<TWWidgetProperty>;
+    properties: Dictionary<TWWidgetProperty & { name: string, type: 'property' | 'service' | 'event' }>;
 
 }
 
@@ -641,7 +641,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * The `severity` can be one of: info, warning, error
      * The message can contain the string `{target-id}` which will be replaced with the widget display name
      */
-    validate(): {severity: string, message: string}[];
+    validate(): { severity: string, message: string }[];
 
     /**
      * Returns the internal value of the given property, without any additional conversions.
@@ -977,8 +977,8 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @param widget Widget to add
      * @param isNew If the widget is new, or already exists
      * @param atPos Where to add the widget. Default to at the end
-     */    
-    addWidget(widget: TWComposerWidget, isNew: boolean, atPos= -1);
+     */
+    addWidget(widget: TWComposerWidget, isNew: boolean, atPos = -1);
 }
 
 
@@ -1534,7 +1534,7 @@ declare interface TWMashupDataBindingDefinition {
  * This specifies the source and source property and the target and target property of a data binding.
  */
 declare interface TWMashupPropertyBindingDefinition {
-    
+
     /**
      * The name of the source property.
      */
@@ -1552,7 +1552,7 @@ declare interface TWMashupPropertyBindingDefinition {
      *  * 'InfoTable' when the data source represents the entire infotable result of a service.
      */
     SourcePropertyType?: string;
-    
+
     /**
      * The name of the target property.
      */
@@ -1889,7 +1889,7 @@ declare abstract class TWMashup extends TWMashupDefinition {
 
 }
 
-declare interface X { 
+declare interface TWNamespace {
     [prop: string]: any;
     Widget: typeof TWRuntimeWidget;
     IDE: {
@@ -1903,4 +1903,4 @@ declare interface X {
         Widgets: Dictionary<typeof TW.Runtime.Widget>;
     }
 }
-declare const TW: X;
+declare const TW: TWNamespace;

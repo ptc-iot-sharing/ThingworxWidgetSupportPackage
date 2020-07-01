@@ -1,3 +1,7 @@
+## 2.0.7 (2020-07-01)
+
+* Corrected the type definitions of `allWidgetProperties().properties` 
+
 ## 2.0.6 (2020-07-01)
 
 * Added missing `@responsiveWidgetContainer` and `@nonRemovable` composer widget annotations
