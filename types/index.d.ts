@@ -433,6 +433,16 @@ declare interface TWWidgetProperties {
 }
 
 /**
+ * Represents a widget context menu item at design time
+ */
+declare interface WidgetContextMenuItem {
+    cmd: string;
+    additionalData: string;
+    menuText: string;
+    icon: string;
+}
+
+/**
  * A class that represents the base controller that manages the lifecycle and content of a Thingworx widget.
  * This abstract class defines the functionality common to both the runtime and design-time versions of widgets.
  */
@@ -948,6 +958,27 @@ declare abstract class TWComposerWidget extends TWWidget {
      */
     getInfotableMetadataForProperty(propertyName: string): Dictionary<TWFieldDefinition> | undefined;
 
+    /**
+     * Returns the list of context menu items that appear when the user clicks on the context menu
+     * in the top right corner of the widget
+     */
+    widgetContextMenuItems(): WidgetContextMenuItem[];
+
+    /**
+     * Method that gets triggered when the user clicks on a custom context menu item
+     * @param command Id of the command as declared in the `WidgetContextMenuItem`
+     * @param additionalData Any specific command data
+     */
+    widgetContextMenuCmd(command: string, additionalData?: any);
+
+    /**
+     * For container widgets, adds a new child widget
+     * 
+     * @param widget Widget to add
+     * @param isNew If the widget is new, or already exists
+     * @param atPos Where to add the widget. Default to at the end
+     */    
+    addWidget(widget: TWComposerWidget, isNew: boolean, atPos= -1);
 }
 
 

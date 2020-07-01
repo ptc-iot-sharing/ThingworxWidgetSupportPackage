@@ -327,9 +327,19 @@ export const requiresResponsiveParent = TWWidgetAspect.aspectWithKeyAndValue('on
 export const draggable = TWWidgetAspect.aspectWithKeyAndValue('isDraggable', true);
 
 /**
+ * Makes this widget non removable
+ */
+export const nonRemovable = TWWidgetAspect.aspectWithKeyAndValue('userCannotRemove', true);
+
+/**
  * Makes this widget a container that can hold other widgets.
  */
 export const container = TWWidgetAspect.aspectWithKeyAndValue('isContainer', true);
+
+/**
+ * Makes this widget a container that can only hold one responsive widget
+ */
+export const responsiveWidgetContainer = TWWidgetAspect.aspectWithKeyAndValue('isContainerForOneResizeableWidget', true);
 
 /**
  * Makes this widget a container that can hold other widgets in specific places.

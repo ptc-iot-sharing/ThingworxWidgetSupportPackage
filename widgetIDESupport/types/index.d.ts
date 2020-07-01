@@ -5,7 +5,7 @@
  * A class that represents a property aspect.
  */
 declare class TWPropertyAspect {
-    private static aspectWithKeyAndValue(key: string, value: any): TWPropertyAspect;
+    public static aspectWithKeyAndValue(key: string, value: any): TWPropertyAspect;
 
     private _key: string;
 
