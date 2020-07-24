@@ -428,7 +428,7 @@ declare interface TWWidgetProperties {
      * by including them in this array. For these properties, it is not required to specify all of their attributes, but rather only the ones
      * that should be different from the default.
      */
-    properties: Dictionary<TWWidgetProperty & { name: string, type: 'property' | 'service' | 'event' }>;
+    properties: Dictionary<TWWidgetProperty & { name?: string, type?: 'property' | 'service' | 'event' }>;
 
 }
 
