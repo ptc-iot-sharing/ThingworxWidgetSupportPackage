@@ -1,6 +1,6 @@
 {
   "name": "widgetidesupport",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "Helper functions to allow usage of typescript and webpack with thingworx widgets. Also includes typings for Thingworx",
   "main": "index.js",
   "module": "index.js",

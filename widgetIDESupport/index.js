@@ -399,6 +399,11 @@ export function customEditorMenuText(value) {
     return TWWidgetAspect.aspectWithKeyAndValue('customEditorMenuText', value);
 }
 
+const TWWidgetFactory = function (widget) {
+    return function () {
+        return new widget(Object.getPrototypeOf(this));
+    }
+}
 
 // This creates an extensible base prototype from which classes can actually inherit
 if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
@@ -407,7 +412,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
         if (window.TWComposerWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < 2) {
+            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < 3) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
@@ -482,39 +487,31 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
-                TWComposerWidget.prototype[versionSymbol] = 2;
+                TWComposerWidget.prototype[versionSymbol] = 3;
 
                 // Make the prototype read-only; future releases will be able to handle this
                 Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
             }
             return;
         }
-        let __BMTWInternalState;
-        let __BMTWArguments;
-        TW.IDE.Widget = function () {
-            TWWidgetConstructor.apply(this, arguments);
-            // To capture the internal state for class-based widgets, the base thingworx widget constructor
-            // is decorated and its object is temporarily stored as a global variable
-            __BMTWInternalState = this;
-            __BMTWArguments = Array.prototype.slice.call(arguments);
-            return this;
-        }
-
-        // Copy over the static methods
-        Object.keys(TWWidgetConstructor).forEach((key) => {
-            TW.IDE.Widget[key] = TWWidgetConstructor[key];
-        });
+        
 
         let internalStates = new WeakMap();
-        window.TWComposerWidget = function () {
+        window.TWComposerWidget = function (proto) {
             // Retain the object's current keys and values
             let keys = Object.keys(this);
             let values = {};
             let self = this;
             keys.forEach((key) => values[key] = self[key]);
 
+            const __BMTWInternalState = proto;
+
+            // As of Thingworx 9, at design time, there are fortunately no parameters passed to the proto constructor
+            // so it is not required to override the prototype constructor like in previous versions
+            const __BMTWArguments = [];
+
             // Invoke the IDE constructor here as well
-            TWWidgetConstructor.apply(this, __BMTWArguments);
+            proto.constructor.apply(this, __BMTWArguments);
 
             // Because Thingworx incorrectly attempts to change the prototype of the exported widget
             // the new prototype is temporarily stored as a global variable and used as the internal state
@@ -556,10 +553,12 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     // after the widget is removed and all its non-prototype properties have been removed
                     // That property is made non-writable in addition to being non-configurable
                     let writable = (key !== 'properties');
+                    // Some special properties need to be configurable, as of thingworx 9
+                    const configurable = ['active', 'selected'].includes(key);
                     if (keys.indexOf(key) != -1) {
                         Object.defineProperty(this, key, {
                             value: values[key],
-                            configurable: false,
+                            configurable: configurable,
                             writable: writable
                         });
                         //this[key] = values[key];
@@ -567,19 +566,15 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     else {
                         Object.defineProperty(this, key, {
                             value: state[key],
-                            configurable: false,
+                            configurable: configurable,
                             writable: writable
                         });
                         //this[key] = state[key];
                     }
                 }
             });
-
-            // Clear out the global internal state to prevent it from leaking
-            __BMTWInternalState = undefined;
-            __BMTWArguments = undefined;
         }
-        TWComposerWidget.prototype = {
+        TWComposerWidget.prototype = Object.assign(Object.create(TWWidgetConstructor.prototype), {
             widgetProperties() {
                 // If this widget was created with aspect decorators, assume that everything
                 // else can be initialized by decorators
@@ -646,8 +641,8 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 }
             },
 
-            [versionSymbol]: 2
-        };
+            [versionSymbol]: 3
+        });
 
         // Make the prototype read-only; future releases will be able to handle this
         Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
@@ -701,9 +696,7 @@ export function TWWidgetDefinition(name, ...args) {
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
-        TW.IDE.Widgets[widget.name] = function () {
-            return new widget;
-        }
+        TW.IDE.Widgets[widget.name] = TWWidgetFactory(widget);
     }
 }
 
@@ -724,9 +717,7 @@ export function ThingworxComposerWidget(widget) {
 
     // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
     // instance when invoked
-    TW.IDE.Widgets[widget.name] = function () {
-        return new widget;
-    }
+    TW.IDE.Widgets[widget.name] = TWWidgetFactory(widget);
 }
 
 /**
@@ -747,8 +738,6 @@ export function TWNamedComposerWidget(name) {
 
         // Instead, the widget constructor is replaced with a dummy function that returns the appropriate
         // instance when invoked
-        TW.IDE.Widgets[name] = function () {
-            return new widget;
-        }
+        TW.IDE.Widgets[name] = TWWidgetFactory(widget);
     }
 }

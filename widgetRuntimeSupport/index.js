@@ -378,7 +378,7 @@ if (typeof TW.Widget == 'function') {
         if (window.TWRuntimeWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if ((!TWRuntimeWidget.prototype[versionSymbol]) || TWRuntimeWidget.prototype[versionSymbol] < 2) {
+            if ((!TWRuntimeWidget.prototype[versionSymbol]) || TWRuntimeWidget.prototype[versionSymbol] < 3) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     updateProperty(info) {
@@ -413,7 +413,7 @@ if (typeof TW.Widget == 'function') {
                 };
                 TWRuntimeWidget.prototype.updateProperty = prototype.updateProperty;
                 TWRuntimeWidget.prototype.serviceInvoked = prototype.serviceInvoked;
-                TWRuntimeWidget.prototype[versionSymbol] = 2;
+                TWRuntimeWidget.prototype[versionSymbol] = 3;
 
             }
             return;
@@ -426,6 +426,8 @@ if (typeof TW.Widget == 'function') {
             __BMTWInternalState = this;
             return this;
         }
+
+        TW.Widget.prototype = TWWidgetConstructor.prototype;
 
         // Copy over the static methods
         Object.keys(TWWidgetConstructor).forEach((key) => {
@@ -466,7 +468,7 @@ if (typeof TW.Widget == 'function') {
             // Clear out the global internal state to prevent it from leaking
             __BMTWInternalState = undefined;
         }
-        TWRuntimeWidget.prototype = {
+        TWRuntimeWidget.prototype = Object.assign(Object.create(TWWidgetConstructor.prototype), {
             updateProperty(info) {
                 const decoratedWillBind = this[willBindSymbol];
                 const value = info.SinglePropertyValue || info.RawSinglePropertyValue;
@@ -497,8 +499,8 @@ if (typeof TW.Widget == 'function') {
                 }
             },
 
-            [versionSymbol]: 2
-        };
+            [versionSymbol]: 3
+        });
     })();
 }
 
