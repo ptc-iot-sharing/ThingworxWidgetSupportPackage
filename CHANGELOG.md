@@ -1,3 +1,7 @@
+## 2.0.9 (2020-09-04)
+
+- Fixes issues importing this project in widgets that depend on `@types/jquery`
+
 ## 2.0.8 (2020-07-31)
 
 - Added compatibly with Thingworx 9 (7b1f12fddec791e54886301f81d8a4078500fc7b)

@@ -1,5 +1,3 @@
-declare interface JQuery<T = HTMLElement> { }
-
 /**
  * An interface representing an object whose key values are constrained to a generic type.
  */
@@ -978,7 +976,7 @@ declare abstract class TWComposerWidget extends TWWidget {
      * @param isNew If the widget is new, or already exists
      * @param atPos Where to add the widget. Default to at the end
      */
-    addWidget(widget: TWComposerWidget, isNew: boolean, atPos = -1);
+    addWidget(widget: TWComposerWidget, isNew: boolean, atPos: number);
 }
 
 
