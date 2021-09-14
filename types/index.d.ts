@@ -179,7 +179,7 @@ declare interface TWWidgetEvent {
  * A union of string defining the available Thingworx base types.
  */
 type TWBaseType = 'STRING' | 'LOCATION' | 'NUMBER' | 'INTEGER' | 'LONG' | 'BOOLEAN' |
-    'DASHBOADNAME' | 'GROUPNAME' | 'GUID' | 'HTML' | 'HYPERLINK' | 'IMAGELINK' |
+    'DASHBOADNAME' | 'GROUPNAME' | 'GUID' | 'HTML' | 'HYPERLINK' | 'IMAGE' | 'IMAGELINK' |
     'MASHUPNAME' | 'MENUNAME' | 'PASSWORD' | 'TEXT' | 'THINGCODE' | 'THINGNAME' |
     'USERNAME' | 'DATETIME' | 'XML' | 'JSON' | 'QUERY' | 'TAGS' |
     'SCHEDULE' | 'ANYSCALAR' | 'BLOB' | 'THINGSHAPENAME' | 'THINGTEMPLATENAME' | 'DATASHAPENAME' |
