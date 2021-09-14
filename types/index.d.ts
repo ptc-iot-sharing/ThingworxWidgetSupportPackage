@@ -1990,7 +1990,7 @@ declare interface TWNamespace {
          * @param defaultValue      A default value to use if the token can't be localized.
          * @returns                 A localized string.
          */
-        convertLocalizableString(token: string, defaultValue: string): string;
+        convertLocalizableString(token: string, defaultValue?: string): string;
 
         /**
          * Returns the translated representation of the given localization token based
@@ -1999,7 +1999,7 @@ declare interface TWNamespace {
          * @param defaultValue      A default value to use if the token can't be localized.
          * @returns                 A localized string.
          */
-        convertHTMLLocalizableString(token: string, defaultValue: string): string;
+        convertHTMLLocalizableString(token: string, defaultValue?: string): string;
 
         /**
          * Performs a request to retrieve the given data shape then executes a callback
