@@ -2073,7 +2073,7 @@ declare interface TWNamespace {
      * @param name      The style definition name.
      * @returns         The style definition content if it was found, `undefined` otherwise.
      */
-    getStyleFromStyleDefinition(name: string): TWStyleDefinition | undefined;
+    getStyleFromStyleDefinition(name: string | TWStyleDefinition): TWStyleDefinition | undefined;
 }
 
 declare const TW: TWNamespace;
