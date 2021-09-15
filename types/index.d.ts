@@ -1315,6 +1315,8 @@ declare abstract class TWEntityDefinition {
     visibilityPermissions: any[];
 }
 
+type TWDataShapeEntityDefinition = TWDataShape & TWEntityDefinition;
+
 /**
  * Represents the definition of a mashup entity.
  * Contains the additional entity fields specific to mashups.
@@ -1887,6 +1889,87 @@ declare abstract class TWMashup extends TWMashupDefinition {
 
 }
 
+/**
+ * The base state information contained in a state definition.
+ */
+interface TWStateBase {
+    defaultStyleDefinition: Object,
+    defaultValue: number,
+    description: string,
+    displayString: string,
+    name: string,
+}
+
+/**
+ * The base state information for numeric states contained in a state definition.
+ */
+interface TWStateBaseNumeric extends TWStateBase {
+    comparator?: string,
+}
+
+/**
+ * State information associated with a property.
+ */
+interface TWState extends TWStateBase {
+    stateDefinitionType: 'string' | 'numeric',
+    styleDefinition: Object,
+    value: string | number,
+    isDefault: boolean,
+}
+
+/**
+ * The interface for a state definition object.
+ */
+interface TWStateDefinition {
+    /**
+     * The state definition's name.
+     */
+    name: string;
+
+    /**
+     * The state content defined in this state definition.
+     */
+    content: {
+        /**
+         * The states that make up this state definition.
+         */
+        stateDefinitions: TWStateBaseNumeric[],
+
+        /**
+         * The type of state definition.
+         */
+        stateType: 'numeric';
+    } | {
+        /**
+         * The states that make up this state definition.
+         */
+        stateDefinitions: TWStateBase[],
+
+        /**
+         * The type of state definition.
+         */
+        stateType: 'string';
+    }
+}
+
+/**
+ * An interface that describes a style definition's content.
+ */
+interface TWStyleDefinition {
+    backgroundColor: string;
+    displayString: string;
+    fontEmphasisBold: boolean;
+    fontEmphasisItalic: boolean;
+    fontEmphasisUnderline: boolean;
+    foregroundColor: string;
+    image: string;
+    lineColor: string;
+    lineStyle: string;
+    lineThickness: number;
+    secondaryBackgroundColor: string;
+    textSize: string;
+}
+
 declare interface TWNamespace {
     [prop: string]: any;
     Widget: typeof TWRuntimeWidget;
@@ -1899,6 +1982,98 @@ declare interface TWNamespace {
         [prop: string]: any;
         Widget: typeof TWRuntimeWidget;
         Widgets: Dictionary<typeof TW.Runtime.Widget>;
+
+        /**
+         * Returns the translated representation of the given localization token based
+         * on the current user's language.
+         * @param token             The token to translate.
+         * @param defaultValue      A default value to use if the token can't be localized.
+         * @returns                 A localized string.
+         */
+        convertLocalizableString(token: string, defaultValue?: string): string;
+
+        /**
+         * Returns the translated representation of the given localization token based
+         * on the current user's language and sanitizes the result.
+         * @param token             The token to translate.
+         * @param defaultValue      A default value to use if the token can't be localized.
+         * @returns                 A localized string.
+         */
+        convertHTMLLocalizableString(token: string, defaultValue?: string): string;
+
+        /**
+         * Performs a request to retrieve the given data shape then executes a callback
+         * containing the data shape definition, if it was found.
+         * @param name          The data shape's name.
+         * @param callback      A callback that is invoked when the data shape request finishes.
+         *                      If a data shape was found, it is passed as the callback's first parameter.
+         */
+        GetDataShapeInfo(name: string, callback: (shape?: TWDataShapeEntityDefinition) => void): void;
     }
+
+    /**
+     * Contains useful functions for formatting dates.
+     */
+    DateUtilities: {
+        /**
+         * Formats the given date using a format specifier.
+         * @param value         The date to format.
+         * @param format        The format specifier.
+         * @returns             A string representing the formatted date.
+         */
+        formatDate(value: Date, format: string): string;
+
+        /**
+         * Converts the given string to a date based on the format specifier.
+         * @param value         The string to convert.
+         * @param format        The format specifier to use.
+         * @returns             The parsed date.
+         */
+        parseDate(value: string, format: string): Date;
+    }
+
+    /**
+     * Converts the given image link name or URL to a URL that can be used to retrieve
+     * a media entity's content.
+     * @param name      The name or URL of the media entity.
+     * @returns         A URL string.
+     */
+    convertImageLink(name: string): string;
+
+    /**
+     * Converts the given string by escaping HTML characters.
+     * @param html      The string to convert.
+     * @returns         A string.
+     */
+    escapeHTML(html: string): string;
+
+    /**
+     * Returns the state definition with the given name.
+     * @param name      The state definition's name.
+     * @returns         The state definition if one was found, `undefined` otherwise.
+     */
+    getStateDefinition(name: string): TWStateDefinition | undefined;
+
+    /**
+     * Returns the states defined for the given state formatting property.
+     * @param property  The state formatting property's value for which to retrieve states.
+     * @returns         An array of states.
+     */
+    getStateInformation(property: unknown): TWState[];
+
+    /**
+     * Returns the style to use from the given state formatting property.
+     * @param property  The state formatting property's value from which to retrieve the style.
+     * @returns         A style definition.
+     */
+    getSyleFromStateFormatting(property: unknown): TWStyleDefinition;
+
+    /**
+     * Retrieves the style definition content from the given style definition name.
+     * @param name      The style definition name.
+     * @returns         The style definition content if it was found, `undefined` otherwise.
+     */
+    getStyleFromStyleDefinition(name: string | TWStyleDefinition): TWStyleDefinition | undefined;
 }
+
 declare const TW: TWNamespace;
