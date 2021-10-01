@@ -92,6 +92,15 @@ export function selectOptions(value) {
 }
 
 /**
+ * Constructs and returns a property aspect that describes what values can be selected for a `THINGNAME` property.
+ * @param {TWPropertyMustImplement} value Set the options that the property must implement
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+ export function mustImplement(value) {
+    return TWPropertyAspect.aspectWithKeyAndValue('mustImplement', value);
+}
+
+/**
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, but before it is actually updated.
  * The method can be used to validate the new property value.
