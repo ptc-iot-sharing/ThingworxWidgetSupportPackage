@@ -20,7 +20,17 @@ declare interface TWPropertySelectOptions {
     value: string;
 }
 
+/**
+ * A possible to limit the number of options in a EntityPicker selection
+ */
+declare interface TWPropertyMustImplement {
+    EntityType: 'ThingTemplates' | 'ThingShapes';
+    EntityName: string;
+}
+
 declare class TWSourceInfotablePropertyAspect extends TWPropertyAspect {
+}
+declare class TWMustImplementAspect extends TWPropertyAspect {
 }
 
 /**
@@ -95,6 +105,13 @@ export function defaultValue(value): TWPropertyAspect;
 export function selectOptions(value: TWPropertySelectOptions[]): TWPropertyAspect;
 
 /**
+ * Constructs and returns a property aspect that describes the type of values that can be selected for a `THINGNAME`  property.
+ * @param {TWPropertyEntityType} value Set the options that the property must implement
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+ export function mustImplement(value: TWPropertyMustImplement): TWMustImplementAspect;
+
+/**
  * Constructs and returns a property aspect that represents the name of a method that will be
  * invoked when user sets a property value, but before it is actually updated.
  * The method can be used to validate the new property value.
@@ -154,6 +171,15 @@ export function property(baseType: TWBaseType, ...args: TWPropertyAspect[]): (ta
  * @return {any}                A decorator.
  */
 export function property(baseType: 'FIELDNAME', sourceProperty: TWSourceInfotablePropertyAspect, ...args: TWPropertyAspect[]): (target: any, key: any, descriptor?: any) => void;
+
+/**
+ * Returns a decorator that marks the given property as a property definition. 
+ * Getting or setting the affected property will then be routed through `getProperty` and `setProperty`.
+ * @param {string} baseType     The property's base type.
+ * @param  {...TWPropertyAspect} args        An optional list of property aspects to apply to this property.
+ * @return {any}                A decorator.
+ */
+export function property(baseType: 'THINGNAME', mustImplement: TWMustImplementAspect, ...args: TWPropertyAspect[]): (target: any, key: any, descriptor?: any) => void;
 
 /**
  * A decorator that marks the given property as a service.
