@@ -83,6 +83,16 @@ export function defaultValue(value) {
 }
 
 /**
+ * Constructs and returns a property aspect that sets the display name of the property.
+ * This value will be displayed in composer instead of the declared property name
+ * @param {any} value               The display name that should be shown in the composer
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function displayName(value) {
+    return TWPropertyAspect.aspectWithKeyAndValue('displayName', value);
+}
+
+/**
  * Constructs and returns a property aspect that sets the list of available options for a property.
  * @param {TWPropertySelectOptions[]} value An array of objects with text and value properties
  * @return {TWPropertyAspect}       A property aspect.
@@ -96,7 +106,7 @@ export function selectOptions(value) {
  * @param {TWPropertyMustImplement} value Set the options that the property must implement
  * @return {TWPropertyAspect}       A property aspect.
  */
- export function mustImplement(value) {
+export function mustImplement(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('mustImplement', value);
 }
 
@@ -472,6 +482,18 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         return result;
                     },
 
+                    afterLoad() {
+                        // Apply all display names to properties/services/events. 
+                        // This is done after the widget has loaded
+                        const properties = this.allWidgetProperties().properties;
+                        for (const property in properties) {
+                            if(properties[property].displayName) {
+                                properties[property].name = properties[property].displayName;
+                            }
+                        }
+                        this.updatedProperties();
+                    },
+
                     beforeSetProperty(key, value) {
                         if (this[willSetSymbol] && (key in this[willSetSymbol])) {
                             return this[this[willSetSymbol][key]](value);
@@ -493,6 +515,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
                 TWComposerWidget.prototype.widgetEvents = prototype.widgetEvents;
                 TWComposerWidget.prototype.widgetServices = prototype.widgetServices;
+                TWComposerWidget.prototype.afterLoad = property.afterLoad;
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
@@ -503,7 +526,6 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             }
             return;
         }
-        
 
         let internalStates = new WeakMap();
         window.TWComposerWidget = function (proto) {
@@ -630,6 +652,18 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     }
                 }
                 return result;
+            },
+
+            afterLoad() {
+                // Apply all display names to properties/services/events. 
+                // This is done after the widget has loaded
+                const properties = this.allWidgetProperties().properties;
+                for (const property in properties) {
+                    if (properties[property].displayName) {
+                        properties[property].name = properties[property].displayName;
+                    }
+                }
+                this.updatedProperties();
             },
 
             beforeSetProperty(key, value) {
