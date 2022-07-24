@@ -515,7 +515,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
                 TWComposerWidget.prototype.widgetEvents = prototype.widgetEvents;
                 TWComposerWidget.prototype.widgetServices = prototype.widgetServices;
-                TWComposerWidget.prototype.afterLoad = property.afterLoad;
+                TWComposerWidget.prototype.afterLoad = prototype.afterLoad;
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
