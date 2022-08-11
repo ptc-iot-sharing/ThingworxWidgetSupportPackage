@@ -165,6 +165,11 @@ function getSymbol(symbolDesc) {
     return TW[symbolDesc];
 }
 
+/**
+ * The version of the TWComposerWidget prototype.
+ */
+const prototypeVersion = 4;
+
 const willSetSymbol = getSymbol('@@_willSet');
 const didSetSymbol = getSymbol('@@_didSet');
 const didBindSymbol = getSymbol('@@_didBind');
@@ -447,7 +452,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
         if (window.TWComposerWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < 4) {
+            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < prototypeVersion) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
@@ -527,7 +532,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
-                TWComposerWidget.prototype[versionSymbol] = 4;
+                TWComposerWidget.prototype[versionSymbol] = prototypeVersion;
 
                 // Make the prototype read-only; future releases will be able to handle this
                 Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
@@ -683,7 +688,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 }
             },
 
-            [versionSymbol]: 4
+            [versionSymbol]: prototypeVersion
         });
 
         // Make the prototype read-only; future releases will be able to handle this
