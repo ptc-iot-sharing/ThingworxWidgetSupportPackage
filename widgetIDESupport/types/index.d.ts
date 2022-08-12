@@ -98,6 +98,14 @@ export function baseTypeRestriction(name): TWPropertyAspect;
 export function defaultValue(value): TWPropertyAspect;
 
 /**
+ * Constructs and returns a property aspect that sets the display name of the property.
+ * This value will be displayed in composer instead of the declared property name
+ * @param {any} value               The displayName value.
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function displayName(value): TWPropertyAspect;
+
+/**
  * Constructs and returns a property aspect that sets the list of available options for a property.
  * @param {TWPropertySelectOptions[]} value An array of objects with text and value properties
  * @return {TWPropertyAspect}       A property aspect.

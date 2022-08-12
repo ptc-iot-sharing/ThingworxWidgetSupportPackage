@@ -83,6 +83,16 @@ export function defaultValue(value) {
 }
 
 /**
+ * Constructs and returns a property aspect that sets the display name of the property.
+ * This value will be displayed in composer instead of the declared property name
+ * @param {any} value               The display name that should be shown in the composer
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function displayName(value) {
+    return TWPropertyAspect.aspectWithKeyAndValue('displayName', value);
+}
+
+/**
  * Constructs and returns a property aspect that sets the list of available options for a property.
  * @param {TWPropertySelectOptions[]} value An array of objects with text and value properties
  * @return {TWPropertyAspect}       A property aspect.
@@ -96,7 +106,7 @@ export function selectOptions(value) {
  * @param {TWPropertyMustImplement} value Set the options that the property must implement
  * @return {TWPropertyAspect}       A property aspect.
  */
- export function mustImplement(value) {
+export function mustImplement(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('mustImplement', value);
 }
 
@@ -154,6 +164,11 @@ function getSymbol(symbolDesc) {
     }
     return TW[symbolDesc];
 }
+
+/**
+ * The version of the TWComposerWidget prototype.
+ */
+const prototypeVersion = 4;
 
 const willSetSymbol = getSymbol('@@_willSet');
 const didSetSymbol = getSymbol('@@_didSet');
@@ -418,10 +433,26 @@ const TWWidgetFactory = function (widget) {
 if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
     (function () {
         let TWWidgetConstructor = TW.IDE.Widget;
+
+        const afterLoadCreate = function () {
+            // Apply all display names to properties/services/events. 
+            // This is done after the widget has loaded
+            const properties = this.allWidgetProperties().properties;
+            for (const property in properties) {
+                if(properties[property].displayName) {
+                    properties[property].name = properties[property].displayName;
+                }
+            }
+            this.updatedProperties({updateUi: true});
+            if (this.jqElement) {
+                this.updateProperties({updateUi: true});
+            }
+        };
+
         if (window.TWComposerWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < 3) {
+            if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < prototypeVersion) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
@@ -472,6 +503,9 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         return result;
                     },
 
+                    afterLoad: afterLoadCreate,
+                    afterCreate: afterLoadCreate,
+
                     beforeSetProperty(key, value) {
                         if (this[willSetSymbol] && (key in this[willSetSymbol])) {
                             return this[this[willSetSymbol][key]](value);
@@ -493,17 +527,18 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
                 TWComposerWidget.prototype.widgetEvents = prototype.widgetEvents;
                 TWComposerWidget.prototype.widgetServices = prototype.widgetServices;
+                TWComposerWidget.prototype.afterLoad = prototype.afterLoad;
+                TWComposerWidget.prototype.afterCreate = prototype.afterCreate;
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
-                TWComposerWidget.prototype[versionSymbol] = 3;
+                TWComposerWidget.prototype[versionSymbol] = prototypeVersion;
 
                 // Make the prototype read-only; future releases will be able to handle this
                 Object.defineProperty(window.TWComposerWidget, 'prototype', { writable: false });
             }
             return;
         }
-        
 
         let internalStates = new WeakMap();
         window.TWComposerWidget = function (proto) {
@@ -632,6 +667,9 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 return result;
             },
 
+            afterLoad: afterLoadCreate,
+            afterCreate: afterLoadCreate,
+
             beforeSetProperty(key, value) {
                 if (this[willSetSymbol] && (key in this[willSetSymbol])) {
                     return this[this[willSetSymbol][key]](value);
@@ -650,7 +688,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 }
             },
 
-            [versionSymbol]: 3
+            [versionSymbol]: prototypeVersion
         });
 
         // Make the prototype read-only; future releases will be able to handle this
