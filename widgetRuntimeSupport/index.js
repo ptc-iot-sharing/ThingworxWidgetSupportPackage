@@ -70,12 +70,23 @@ const decoratedPropertiesSymbol = getSymbol('@@_decoratedProperties');
 const decoratedServicesSymbol = getSymbol('@@_decoratedServices');
 const versionSymbol = getSymbol('@@_version');
 
+/**
+ * Retrieves the store for decorated properties of the specified kind. If the specified
+ * prototype does not have a store of that type initialized, this function creates an
+ * empty store, then copies the decorator metadata from its super prototype and returns it.
+ * @param proto             The prototype for which the store should be retrieved.
+ * @param property          The symbol identifying the store kind to obtain.
+ * @returns                 The requested store.
+ */
 const _getInheritedProperty = function (proto, property) {
-    if (proto[property]) return proto[property];
+    // If the store was already initialized, return it
+    if (proto.hasOwnProperty(property)) return proto[property];
 
-    const superproto = Object.getPrototypeOf(proto);
-
+    // If no store was available, create an empty one
     proto[property] = {};
+
+    // And inherit all the superclass metadata
+    const superproto = Object.getPrototypeOf(proto);
     for (const key in superproto[property]) {
         proto[property][key] = superproto[property][key];
     }
@@ -378,12 +389,12 @@ if (typeof TW.Widget == 'function') {
         if (window.TWRuntimeWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
-            if ((!TWRuntimeWidget.prototype[versionSymbol]) || TWRuntimeWidget.prototype[versionSymbol] < 3) {
+            if ((!TWRuntimeWidget.prototype[versionSymbol]) || TWRuntimeWidget.prototype[versionSymbol] < 4) {
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     updateProperty(info) {
                         const decoratedWillBind = this[willBindSymbol];
-                        const value = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                        const value = info.RawSinglePropertyValue;
         
                         let shouldUpdate = true;
                         if (info.TargetProperty in decoratedWillBind) {
@@ -394,7 +405,7 @@ if (typeof TW.Widget == 'function') {
         
                         if (shouldUpdate && (info.TargetProperty in decoratedProperties)) {
                             const currentValue = this.getProperty(info.TargetProperty);
-                            this[decoratedProperties[info.TargetProperty]] = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                            this[decoratedProperties[info.TargetProperty]] = value;
         
                             const decoratedDidBind = this[didBindSymbol];
         
@@ -413,7 +424,7 @@ if (typeof TW.Widget == 'function') {
                 };
                 TWRuntimeWidget.prototype.updateProperty = prototype.updateProperty;
                 TWRuntimeWidget.prototype.serviceInvoked = prototype.serviceInvoked;
-                TWRuntimeWidget.prototype[versionSymbol] = 3;
+                TWRuntimeWidget.prototype[versionSymbol] = 4;
 
             }
             return;
@@ -471,7 +482,7 @@ if (typeof TW.Widget == 'function') {
         TWRuntimeWidget.prototype = Object.assign(Object.create(TWWidgetConstructor.prototype), {
             updateProperty(info) {
                 const decoratedWillBind = this[willBindSymbol];
-                const value = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                const value = info.RawSinglePropertyValue;
 
                 let shouldUpdate = true;
                 if (info.TargetProperty in decoratedWillBind) {
@@ -482,7 +493,7 @@ if (typeof TW.Widget == 'function') {
 
                 if (shouldUpdate && (info.TargetProperty in decoratedProperties)) {
                     const currentValue = this.getProperty(info.TargetProperty);
-                    this[decoratedProperties[info.TargetProperty]] = info.SinglePropertyValue || info.RawSinglePropertyValue;
+                    this[decoratedProperties[info.TargetProperty]] = value;
 
                     const decoratedDidBind = this[didBindSymbol];
 
@@ -499,7 +510,7 @@ if (typeof TW.Widget == 'function') {
                 }
             },
 
-            [versionSymbol]: 3
+            [versionSymbol]: 4
         });
     })();
 }
