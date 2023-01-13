@@ -175,12 +175,24 @@ const didSetSymbol = getSymbol('@@_didSet');
 const didBindSymbol = getSymbol('@@_didBind');
 const versionSymbol = getSymbol('@@_version');
 
+
+/**
+ * Retrieves the store for decorated properties of the specified kind. If the specified
+ * prototype does not have a store of that type initialized, this function creates an
+ * empty store, then copies the decorator metadata from its super prototype and returns it.
+ * @param proto             The prototype for which the store should be retrieved.
+ * @param property          The symbol identifying the store kind to obtain.
+ * @returns                 The requested store.
+ */
 const _getInheritedProperty = function (proto, property) {
+    // If the store was already initialized, return it
     if (proto.hasOwnProperty(property)) return proto[property];
 
-    const superproto = Object.getPrototypeOf(proto);
-
+    // If no store was available, create an empty one
     proto[property] = {};
+
+    // And inherit all the superclass metadata
+    const superproto = Object.getPrototypeOf(proto);
     for (const key in superproto[property]) {
         proto[property][key] = superproto[property][key];
     }
