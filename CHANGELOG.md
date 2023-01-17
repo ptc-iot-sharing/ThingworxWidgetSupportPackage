@@ -1,3 +1,8 @@
+## 2.2.1 (2023-01-17)
+
+- Fix issue that caused boolean or other non string properties from being correctly propagated
+- Certain decorator aspects were copied on all classes that extended from a base class. This was because the check to initialise or retrieve the decorator store was always returning the superclass store rather than initialising a new one on the subclasses.
+
 ## 2.0.9 (2020-09-04)
 
 - Fixes issues importing this project in widgets that depend on `@types/jquery`
