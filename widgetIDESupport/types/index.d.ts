@@ -49,6 +49,11 @@ export const bindingSource: TWPropertyAspect;
 export const nonEditable: TWPropertyAspect;
 
 /**
+ * Makes this property nullable in the composer.
+ */
+export const nullable: TWPropertyAspect;
+
+/**
  * Makes this property hidden.
  */
 export const hidden: TWPropertyAspect;
@@ -104,6 +109,15 @@ export function defaultValue(value): TWPropertyAspect;
  * @return {TWPropertyAspect}       A property aspect.
  */
 export function displayName(value): TWPropertyAspect;
+
+/**
+ * Constructs and returns a property aspect that sets the placeholder of the property.
+ * This value will be displayed in composer when the widget has the `nullable` aspect
+ * and `undefined` as its value.
+ * @param {string} value            The placeholder that should be shown in the composer
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function placeholder(value: string): TWPropertyAspect;
 
 /**
  * Constructs and returns a property aspect that sets the list of available options for a property.
