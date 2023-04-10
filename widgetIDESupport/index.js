@@ -26,6 +26,11 @@ export const bindingSource = TWPropertyAspect.aspectWithKeyAndValue('isBindingSo
 export const nonEditable = TWPropertyAspect.aspectWithKeyAndValue('isEditable', false);
 
 /**
+ * Makes this property nullable in the composer.
+ */
+export const nullable = TWPropertyAspect.aspectWithKeyAndValue('canBeUndefined', true);
+
+/**
  * Makes this property hidden.
  */
 export const hidden = TWPropertyAspect.aspectWithKeyAndValue('isVisible', false);
@@ -83,6 +88,8 @@ export function defaultValue(value) {
 }
 
 /**
+ * @deprecated Not compatbile with recent versions of Thingworx.
+ * ---
  * Constructs and returns a property aspect that sets the display name of the property.
  * This value will be displayed in composer instead of the declared property name
  * @param {any} value               The display name that should be shown in the composer
@@ -90,6 +97,17 @@ export function defaultValue(value) {
  */
 export function displayName(value) {
     return TWPropertyAspect.aspectWithKeyAndValue('displayName', value);
+}
+
+/**
+ * Constructs and returns a property aspect that sets the placeholder of the property.
+ * This value will be displayed in composer when the widget has the `nullable` aspect
+ * and `undefined` as its value.
+ * @param {string} value            The placeholder that should be shown in the composer
+ * @return {TWPropertyAspect}       A property aspect.
+ */
+export function placeholder(value) {
+    return TWPropertyAspect.aspectWithKeyAndValue('placeholder', value);
 }
 
 /**
