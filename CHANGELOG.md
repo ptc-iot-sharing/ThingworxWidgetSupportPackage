@@ -1,3 +1,7 @@
+## 2.2.2 (2023-04-10)
+
+- Adds property aspects that can be used to mark properties as nullable and specify a placeholder for them, for example, to support the "Autosize" behaviour on the width and height properties.
+
 ## 2.2.1 (2023-01-17)
 
 - Fix issue that caused boolean or other non string properties from being correctly propagated
