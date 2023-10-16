@@ -51,7 +51,7 @@ declare interface TWDataShape {
  * Note that on the client side, infotables are just dummy objects
  * and do not support any of the usual server-side methods.
  */
-declare interface TWInfotable {
+declare interface TWInfotable<T = any> {
     /**
      * The infotable's data shape.
      */
@@ -60,7 +60,7 @@ declare interface TWInfotable {
     /**
      * The contents of the infotable.
      */
-    rows: any[];
+    rows: T[];
 }
 
 /**
