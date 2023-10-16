@@ -543,12 +543,12 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     },
 
                     afterSetProperty(key, value) {
-                        if (this[didSetSymbol] && (key in this[didSetSymbol])) {
-                            return this[this[didSetSymbol][key]](value);
-                        }
                         // call the setters that are associated with this property
                         if (this._decoratedProperties[key]) {
                             this[key] = value;
+                        }
+                        if (this[didSetSymbol] && (key in this[didSetSymbol])) {
+                            return this[this[didSetSymbol][key]](value);
                         }
                     },
 
