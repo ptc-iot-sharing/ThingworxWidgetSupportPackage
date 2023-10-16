@@ -186,7 +186,7 @@ function getSymbol(symbolDesc) {
 /**
  * The version of the TWComposerWidget prototype.
  */
-const prototypeVersion = 4;
+const prototypeVersion = 5;
 
 const willSetSymbol = getSymbol('@@_willSet');
 const didSetSymbol = getSymbol('@@_didSet');
@@ -545,6 +545,10 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                     afterSetProperty(key, value) {
                         if (this[didSetSymbol] && (key in this[didSetSymbol])) {
                             return this[this[didSetSymbol][key]](value);
+                        }
+                        // call the setters that are associated with this property
+                        if (this._decoratedProperties[key]) {
+                            this[key] = value;
                         }
                     },
 
