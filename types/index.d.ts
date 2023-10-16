@@ -466,8 +466,13 @@ declare abstract class TWWidget {
      * @param defaultValue      An optional default value that will be returned if the property has not yet been assigned any value.
      * @return                  The property's value.
      */
-    getProperty(property: string, defaultValue?: any): any;
-
+    getProperty: {
+        // When specifying a default value, infer the type from that value
+        <T = any>(name: string, defaultValue?: T): T;
+        (name: 'Type'): string;
+        (name: 'DisplayName'): string;
+        (name: 'Id'): string;
+    };
     /**
      * Sets the value of the given property.
      * If this property is bound to any targets, they will be updated accordingly.
@@ -1041,7 +1046,13 @@ declare abstract class TWRuntimeWidget extends TWWidget {
      * @param defaultValue      Defaults to `undefined`. An optional default value to return if this property doesn't yet have a value.
      * @return                  The property's value, or the value specified in the `defaultValue` parameter if the property hasn't yet been set.
      */
-    getProperty(name: string, defaultValue?: any | undefined): any | undefined;
+    getProperty: {
+        // When specifying a default value, infer the type from that value
+        <T = any>(name: string, defaultValue?: T): T;
+        (name: 'Type'): string;
+        (name: 'DisplayName'): string;
+        (name: 'Id'): string;
+    };
 
     /**
      * Sets the value of the given property.
