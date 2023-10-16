@@ -2114,3 +2114,104 @@ declare class ThingworxInvoker {
     reject: (details: unknown) => void
   );
 }
+
+declare type TWLocation = {
+  latitude: number;
+  longitude: number;
+  altitude?: number;
+  units?: string;
+};
+
+declare interface TWQuery<T = any> {
+  sorts?: SortFilter<T, keyof T>[];
+  filters: QueryFilter<T>;
+}
+
+declare interface SortFilter<T, K extends keyof T> {
+  fieldName: K;
+  isAscending?: boolean;
+  isCaseSensitive?: boolean;
+}
+
+declare interface AndOrQueryFilter<T> {
+  type: "AND" | "OR";
+  filters: QueryFilter<T>[];
+}
+
+type SingleValueFilter<T> = keyof T extends infer K
+  ? K extends keyof T
+    ? {
+        type: "EQ" | "NE" | "LIKE" | "GT" | "LT" | "LE" | "GE" | "NOTLIKE";
+        fieldName: K;
+        value: T[K];
+      }
+    : never
+  : never;
+
+type RegexFilter<T> = keyof T extends infer K
+  ? K extends keyof T
+    ? T[K] extends string
+      ? {
+          type: "Matches" | "NotMatches";
+          fieldName: K;
+          expression: string;
+        }
+      : never
+    : never
+  : never;
+
+type BetweenFilter<T> = keyof T extends infer K
+  ? K extends keyof T
+    ? {
+        type: "BETWEEN" | "NOTBETWEEN" | "Between" | "NotBetween";
+        fieldName: K;
+        from: T[K];
+        to: T[K];
+      }
+    : never
+  : never;
+
+type TaggedFilter<T> = {
+  type: "TAGGED" | "NOTTAGGED";
+  fieldName: string;
+  tags: { vocabulary: string; vocabularyTerm: string }[] | string;
+};
+
+type ContainsFilter<T> = keyof T extends infer K
+  ? K extends keyof T
+    ? {
+        type: "IN" | "NOTIN";
+        fieldName: K;
+        values: T[K][];
+      }
+    : never
+  : never;
+
+type MissingValueFilter<T> = {
+  type: "MissingValue" | "NotMissingValue";
+  fieldName: keyof T;
+};
+
+type LocationFilter<T> = keyof T extends infer K
+  ? K extends keyof T
+    ? T[K] extends TWLocation
+      ? {
+          type: "Near" | "NotNear";
+          fieldName: K;
+          distance: number;
+          units: "M" | "K" | "N";
+          location: T[K];
+        }
+      : never
+    : never
+  : never;
+
+type QueryFilter<T> =
+  | AndOrQueryFilter<T>
+  | SingleValueFilter<T>
+  | BetweenFilter<T>
+  | RegexFilter<T>
+  | TaggedFilter<T>
+  | ContainsFilter<T>
+  | MissingValueFilter<T>
+  | LocationFilter<T>;
