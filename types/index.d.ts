@@ -2077,3 +2077,40 @@ declare interface TWNamespace {
 }
 
 declare const TW: TWNamespace;
+
+interface ThingworxInvokerCtorParams {
+  entityType: string;
+  entityName: string;
+  characteristic: string;
+  target: string;
+  apiMethod: "get" | "delete" | "post" | "put";
+  parameters?: Record<string, unknown>;
+  properties?: Record<string, unknown>;
+}
+
+/**
+ * The `ThingworxInvoker` is available globally and allows
+ * for calling ThingWorx endpoints in a reliable way, while 
+ * being able to transform the results (for example, uncompressing infotables)
+ */
+declare class ThingworxInvoker {
+  /**
+   * Parameters the service will be called with
+   */
+  parameters: Record<string, unknown>;
+  
+  /**
+   * Create a new ThingworxInvoker class for a given thingworx endpoint
+   */
+  constructor(args: ThingworxInvokerCtorParams);
+
+  /**
+   * Invoke the specified service of this invoker
+   * @param resolve Method to be called if the service is successfully invoked
+   * @param reject Method to be called if the service failed
+   */
+  invokeService(
+    resolve: (data: { result: TWInfotable }) => void,
+    reject: (details: unknown) => void
+  );
+}
