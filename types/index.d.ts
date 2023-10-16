@@ -1995,6 +1995,7 @@ declare interface TWNamespace {
         [prop: string]: any;
         Widget: typeof TWComposerWidget;
         Widgets: Dictionary<typeof TW.IDE.Widget>;
+        convertLocalizableString: (token: string) => string;
     };
     Runtime: {
         [prop: string]: any;
