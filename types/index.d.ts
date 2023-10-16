@@ -731,9 +731,16 @@ declare abstract class TWComposerWidget extends TWWidget {
     /**
      * Should be invoked whenever the widget's properties are updated.
      * Subclasses are expected to not override this method.
-     * @param updateUi      Defaults to false. Should be set to true to update the properties panel for this widget when it is selected.
+     * @param obj                  Parameters to pass into the function 
+     * @param obj.updateUi         Defaults to false. Should be set to true to update the properties panel for this widget when it is selected.
+     * @param obj.isWidthModified  Defaults to undefined. Should be set to false, if the width of the widget was not modified.
+     * @param obj.isHeightModified Defaults to undefined. Should be set to false, if the height of the widget was not modified.
      */
-    updateProperties({ updateUi }?: { updateUi?: boolean }): void;
+    updateProperties({ updateUi, isWidthModified, isHeightModified }?: {
+        updateUi?: boolean;
+        isWidthModified?: boolean;
+        isHeightModified?: boolean;
+    }): void;
 
     /**
      * Should be invoked after the property structure of this widget has been updated and the
