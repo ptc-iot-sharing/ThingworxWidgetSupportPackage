@@ -1,3 +1,17 @@
+## 2.3.0 (2023-10-18)
+
+- Features
+  - At IDE, for `@property` annotations, setters can also be used instead of just `@didSet` decorators
+- Bug fixes
+  - Fix error that would appear in the browser console when a widget is destroyed
+- Documentation
+  - Added documentation about the global ThingWorx invoker class 
+  - Add documentation for TWQuery, copied from the [BMThingTransformer](https://github.com/BogdanMihaiciuc/ThingTransformer/blob/master/static/types/TWBaseTypes.d.ts#L365) package
+  - Make the `TWInfotable` types generic
+  - Added missing IDE `updateProperties` method parameters added in ThingWorx 9.3
+  - Make the `getProperty`, allowing the user to either specify a type, or have the type inferred from the default value
+  - Add `IDE.convertLocalizableString`
+
 ## 2.2.2 (2023-04-10)
 
 - Adds property aspects that can be used to mark properties as nullable and specify a placeholder for them, for example, to support the "Autosize" behaviour on the width and height properties.
