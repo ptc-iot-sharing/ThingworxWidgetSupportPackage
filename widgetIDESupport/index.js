@@ -265,7 +265,7 @@ export function property(baseType, ...args) {
         // Add this automatic property to the internal binding map
         target._decoratedProperties[key] = {
             baseType: baseType,
-            type: 'property'
+            type: 'property',
         };
 
         if (args) for (const arg of args) {
@@ -479,10 +479,94 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             }
         };
 
+        const constructor = function (proto) {
+            // Retain the object's current keys and values
+            let keys = Object.keys(this);
+            let values = {};
+            let self = this;
+            keys.forEach((key) => values[key] = self[key]);
+
+            const __BMTWInternalState = proto;
+
+            // As of Thingworx 9, at design time, there are fortunately no parameters passed to the proto constructor
+            // so it is not required to override the prototype constructor like in previous versions
+            const __BMTWArguments = [];
+
+            // Invoke the IDE constructor here as well
+            proto.constructor.apply(this, __BMTWArguments);
+
+            // Because Thingworx incorrectly attempts to change the prototype of the exported widget
+            // the new prototype is temporarily stored as a global variable and used as the internal state
+            // for the widget
+            internalStates.set(this, __BMTWInternalState);
+
+            // After the internal state is initialized, all of its methods are redefined and bound
+            // to the real widget and all of its properties are copied over to the widget
+            // A possible hurdle would be the `thisWidget` reference to self that the Thingworx widget
+            // creates, however that is reset in `appendTo` to that function's context object
+            Object.keys(__BMTWInternalState).forEach((key) => {
+                let value = __BMTWInternalState[key];
+                let state = __BMTWInternalState;
+
+                if (typeof value == 'function') {
+                    if (!TWComposerWidget.prototype[key]) {
+                        (TWComposerWidget.prototype[key] = function () {
+                            return internalStates.get(this)[key].apply(this, arguments);
+                        })
+                    }
+                    __BMTWInternalState[key] = value.bind(this);
+                    if (keys.indexOf(key) == -1) {
+                        // Remove methods which are already defined on the prototype
+                        delete this[key];
+                    }
+                    else {
+                        // Otherwise restore the previous value, making it non-configurable
+                        Object.defineProperty(this, key, {
+                            value: values[key],
+                            configurable: false,
+                            writable: true
+                        });
+                        //this[key] = values[key];
+                    }
+                }
+                else {
+                    // Restore previous values if they were defined, making them unconfigurable
+                    // A special exception has to be made for the 'properties' property which thingworx continues to use
+                    // after the widget is removed and all its non-prototype properties have been removed
+                    // That property is made non-writable in addition to being non-configurable
+                    let writable = (key !== 'properties');
+                    // Some special properties need to be configurable, as of thingworx 9
+                    const configurable = ['active', 'selected', 'eventHelper', 'visible'].includes(key);
+                    if (keys.indexOf(key) != -1) {
+                        Object.defineProperty(this, key, {
+                            value: values[key],
+                            configurable: configurable,
+                            writable: writable
+                        });
+                        //this[key] = values[key];
+                    }
+                    else {
+                        Object.defineProperty(this, key, {
+                            value: state[key],
+                            configurable: configurable,
+                            writable: writable
+                        });
+                        //this[key] = state[key];
+                    }
+                }
+            });
+        };
+
         if (window.TWComposerWidget) {
             // Note that despite looking like a regular class, this will still require that widgets are created by thingworx
             // as they cannot function without the base instance created by `new TW.IDE.Widget()`
             if ((!TWComposerWidget.prototype[versionSymbol]) || TWComposerWidget.prototype[versionSymbol] < prototypeVersion) {
+
+                // In this version the constructor body was updated
+                if (TWComposerWidget.prototype[versionSymbol] < 5) {
+                    window.TWComposerWidget = constructor;
+                }
+
                 // Duplication needed for compatibility with previous versions
                 let prototype = {
                     widgetProperties() {
@@ -575,83 +659,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
         }
 
         let internalStates = new WeakMap();
-        window.TWComposerWidget = function (proto) {
-            // Retain the object's current keys and values
-            let keys = Object.keys(this);
-            let values = {};
-            let self = this;
-            keys.forEach((key) => values[key] = self[key]);
-
-            const __BMTWInternalState = proto;
-
-            // As of Thingworx 9, at design time, there are fortunately no parameters passed to the proto constructor
-            // so it is not required to override the prototype constructor like in previous versions
-            const __BMTWArguments = [];
-
-            // Invoke the IDE constructor here as well
-            proto.constructor.apply(this, __BMTWArguments);
-
-            // Because Thingworx incorrectly attempts to change the prototype of the exported widget
-            // the new prototype is temporarily stored as a global variable and used as the internal state
-            // for the widget
-            internalStates.set(this, __BMTWInternalState);
-
-            // After the internal state is initialized, all of its methods are redefined and bound
-            // to the real widget and all of its properties are copied over to the widget
-            // A possible hurdle would be the `thisWidget` reference to self that the Thingworx widget
-            // creates, however that is reset in `appendTo` to that function's context object
-            Object.keys(__BMTWInternalState).forEach((key) => {
-                let value = __BMTWInternalState[key];
-                let state = __BMTWInternalState;
-
-                if (typeof value == 'function') {
-                    if (!TWComposerWidget.prototype[key]) {
-                        (TWComposerWidget.prototype[key] = function () {
-                            return internalStates.get(this)[key].apply(this, arguments);
-                        })
-                    }
-                    __BMTWInternalState[key] = value.bind(this);
-                    if (keys.indexOf(key) == -1) {
-                        // Remove methods which are already defined on the prototype
-                        delete this[key];
-                    }
-                    else {
-                        // Otherwise restore the previous value, making it non-configurable
-                        Object.defineProperty(this, key, {
-                            value: values[key],
-                            configurable: false,
-                            writable: true
-                        });
-                        //this[key] = values[key];
-                    }
-                }
-                else {
-                    // Restore previous values if they were defined, making them unconfigurable
-                    // A special exception has to be made for the 'properties' property which thingworx continues to use
-                    // after the widget is removed and all its non-prototype properties have been removed
-                    // That property is made non-writable in addition to being non-configurable
-                    let writable = (key !== 'properties');
-                    // Some special properties need to be configurable, as of thingworx 9
-                    const configurable = ['active', 'selected'].includes(key);
-                    if (keys.indexOf(key) != -1) {
-                        Object.defineProperty(this, key, {
-                            value: values[key],
-                            configurable: configurable,
-                            writable: writable
-                        });
-                        //this[key] = values[key];
-                    }
-                    else {
-                        Object.defineProperty(this, key, {
-                            value: state[key],
-                            configurable: configurable,
-                            writable: writable
-                        });
-                        //this[key] = state[key];
-                    }
-                }
-            });
-        }
+        window.TWComposerWidget = constructor;
         TWComposerWidget.prototype = Object.assign(Object.create(TWWidgetConstructor.prototype), {
             widgetProperties() {
                 // If this widget was created with aspect decorators, assume that everything
