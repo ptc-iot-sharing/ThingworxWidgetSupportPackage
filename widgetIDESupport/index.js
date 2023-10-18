@@ -479,6 +479,8 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             }
         };
 
+        let internalStates = new WeakMap();
+
         const constructor = function (proto) {
             // Retain the object's current keys and values
             let keys = Object.keys(this);
@@ -492,18 +494,6 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             // so it is not required to override the prototype constructor like in previous versions
             const __BMTWArguments = [];
 
-            // Invoke the IDE constructor here as well
-            proto.constructor.apply(this, __BMTWArguments);
-
-            // Because Thingworx incorrectly attempts to change the prototype of the exported widget
-            // the new prototype is temporarily stored as a global variable and used as the internal state
-            // for the widget
-            internalStates.set(this, __BMTWInternalState);
-
-            // After the internal state is initialized, all of its methods are redefined and bound
-            // to the real widget and all of its properties are copied over to the widget
-            // A possible hurdle would be the `thisWidget` reference to self that the Thingworx widget
-            // creates, however that is reset in `appendTo` to that function's context object
             Object.keys(__BMTWInternalState).forEach((key) => {
                 let value = __BMTWInternalState[key];
                 let state = __BMTWInternalState;
@@ -529,14 +519,32 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         //this[key] = values[key];
                     }
                 }
-                else {
+            });
+
+            // Because Thingworx incorrectly attempts to change the prototype of the exported widget
+            // the new prototype is temporarily stored as a global variable and used as the internal state
+            // for the widget
+            internalStates.set(this, __BMTWInternalState);
+
+            // Invoke the IDE constructor here as well
+            proto.constructor.apply(this, __BMTWArguments);
+
+            // After the internal state is initialized, all of its methods are redefined and bound
+            // to the real widget and all of its properties are copied over to the widget
+            // A possible hurdle would be the `thisWidget` reference to self that the Thingworx widget
+            // creates, however that is reset in `appendTo` to that function's context object
+            Object.keys(__BMTWInternalState).forEach((key) => {
+                let value = __BMTWInternalState[key];
+                let state = __BMTWInternalState;
+
+                if (typeof value != 'function') {
                     // Restore previous values if they were defined, making them unconfigurable
                     // A special exception has to be made for the 'properties' property which thingworx continues to use
                     // after the widget is removed and all its non-prototype properties have been removed
                     // That property is made non-writable in addition to being non-configurable
                     let writable = (key !== 'properties');
                     // Some special properties need to be configurable, as of thingworx 9
-                    const configurable = ['active', 'selected', 'eventHelper', 'visible'].includes(key);
+                    const configurable = ['active', 'selected', 'eventHelper', 'visible', 'properties'].includes(key);
                     if (keys.indexOf(key) != -1) {
                         Object.defineProperty(this, key, {
                             value: values[key],
@@ -564,7 +572,9 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
 
                 // In this version the constructor body was updated
                 if (TWComposerWidget.prototype[versionSymbol] < 5) {
+                    const proto = TWComposerWidget.prototype;
                     window.TWComposerWidget = constructor;
+                    TWComposerWidget.prototype = proto;
                 }
 
                 // Duplication needed for compatibility with previous versions
@@ -640,6 +650,15 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                         if (this[didBindSymbol] && (info.targetProperty in this[didBindSymbol])) {
                             return this[this[didBindSymbol][info.targetProperty]](info);
                         }
+                    },
+
+                    destroy() {
+                        Object.defineProperty(this, 'properties', {
+                            configurable: true,
+                            writable: true,
+                            value: this.properties
+                        });
+                        TWWidgetConstructor.prototype.destroy.apply(this, arguments);
                     }
                 };
                 TWComposerWidget.prototype.widgetProperties = prototype.widgetProperties;
@@ -650,6 +669,7 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 TWComposerWidget.prototype.beforeSetProperty = prototype.beforeSetProperty;
                 TWComposerWidget.prototype.afterSetProperty = prototype.afterSetProperty;
                 TWComposerWidget.prototype.afterAddBindingSource = prototype.afterAddBindingSource;
+                TWComposerWidget.prototype.destroy = prototype.destroy;
                 TWComposerWidget.prototype[versionSymbol] = prototypeVersion;
 
                 // Make the prototype read-only; future releases will be able to handle this
@@ -658,7 +678,6 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
             return;
         }
 
-        let internalStates = new WeakMap();
         window.TWComposerWidget = constructor;
         TWComposerWidget.prototype = Object.assign(Object.create(TWWidgetConstructor.prototype), {
             widgetProperties() {
@@ -728,6 +747,15 @@ if (TW.IDE && (typeof TW.IDE.Widget == 'function')) {
                 if (this[didBindSymbol] && (info.targetProperty in this[didBindSymbol])) {
                     return this[this[didBindSymbol][info.targetProperty]](info);
                 }
+            },
+
+            destroy() {
+                Object.defineProperty(this, 'properties', {
+                    configurable: true,
+                    writable: true,
+                    value: this.properties
+                });
+                TWWidgetConstructor.prototype.destroy.apply(this, arguments);
             },
 
             [versionSymbol]: prototypeVersion
