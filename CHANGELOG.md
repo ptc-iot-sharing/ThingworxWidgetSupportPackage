@@ -1,10 +1,15 @@
+## 2.3.1 (2023-10-19)
+
+- Typescript definitions
+  - Added more missing definitions at IDE
+ 
 ## 2.3.0 (2023-10-18)
 
 - Features
   - At IDE, for `@property` annotations, setters can also be used instead of just `@didSet` decorators
 - Bug fixes
   - Fix error that would appear in the browser console when a widget is destroyed
-- Documentation
+- Typescript definitions
   - Added documentation about the global ThingWorx invoker class 
   - Add documentation for TWQuery, copied from the [BMThingTransformer](https://github.com/BogdanMihaiciuc/ThingTransformer/blob/master/static/types/TWBaseTypes.d.ts#L365) package
   - Make the `TWInfotable` types generic

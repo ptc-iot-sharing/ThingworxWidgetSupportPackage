@@ -1421,6 +1421,11 @@ declare interface TWMashupDataSource {
      * An array of services exposed by this data source.
      */
     Services: TWMashupServiceDefinition[];
+    
+    /**
+     * A map of the service names to the service definitions
+     */
+    ServiceInvocations: Record<string, TWMashupServiceDefinition>;
 }
 
 /**
@@ -1698,7 +1703,7 @@ declare abstract class TWMashupDefinition {
  */
 declare abstract class TWDataManager {
     addDataChangeSubscriber(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
-    addSelcetedRowsChangedEventSubscription(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
+    addSelectedRowsChangedEventSubscription(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
     addSelectedRowsForWidgetHandleSelectionUpdateSubscription(dataBinding: TWMashupDataBindingDefinition, subscriberFunction: () => void): any;
     beforePublishDataChange(binding: any, value: any): any;
     beforePublishDataChangeFromServiceReturn(dataName: string, service: string, value: any): any;
@@ -1706,7 +1711,7 @@ declare abstract class TWDataManager {
     beforePublishDataChangeWithData(binding: any, value: any): any;
     destroy(): any;
     getPropertySubscriptions(): any;
-    getUpdatePropertyInfoFromBindingSource(dataBinding: any): any;
+    getUpdatePropertyInfoFromBindingSource(dataBinding: TWMashupDataBindingDefinition): TWUpdatePropertyInfo;
     handleDataAdded(data: any): any;
     handleSubscriptionOnDynamicEntity(oldEntityType: any, oldEntityName: any, def: any): any;
     ignore_updateSelectionFromWidget: boolean;
@@ -1905,6 +1910,13 @@ declare abstract class TWMashup extends TWMashupDefinition {
      */
     updateStyles(): void;
 
+    /**
+     * Gets the actual current value of a Dynamic Thing Name data source.
+     * @param unused Not used, an `undefined` should be passed in
+     * @param dataName Actual data name, as present on `mashup.Data`. Example: `DynamicThingTemplates_GenericThing`
+     */
+    getDynamicThingEntityName(unused: unknown, dataName: string): string | undefined;
+
 }
 
 /**
@@ -2028,6 +2040,13 @@ declare interface TWNamespace {
          *                      If a data shape was found, it is passed as the callback's first parameter.
          */
         GetDataShapeInfo(name: string, callback: (shape?: TWDataShapeEntityDefinition) => void): void;
+
+        /**
+         * Converts the specified value to the target baseType specified in the propertyMap
+         * @param value Value to convert
+         * @param propertyMap Property map to apply, describing the current baseType, and the target one
+         */
+        baseTypeConversion(value: unknown, propertyMap: TWMashupPropertyBindingDefinition)
     }
 
     /**
