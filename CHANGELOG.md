@@ -1,3 +1,8 @@
+## 2.4.0 (2024-02-09)
+
+- Breaking changes
+  - At IDE, for `@property` annotations, setters CAN NO LONGER BE USED. `@didSet` decorators must be used instead.
+
 ## 2.3.1 (2023-10-19)
 
 - Typescript definitions
